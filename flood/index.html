@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>محاسبه‌گر صرفه‌جویی آبادیس — طرح سیلاب</title>
+  <meta name="description" content="محاسبه‌گر صرفه‌جویی آبادیس (طرح سیلاب): با اسکرول، صرفه‌جویی در مصرف آب، هزینه شست‌وشو و ضدعفونی و زمان کادر درمان را ببینید." />
+  <meta name="theme-color" content="#e8f3f3" />
+  <script>
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem('abadis-theme'); } catch (e) {}
+      if (t !== 'dark' && t !== 'light') t = (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <link rel="icon" type="image/png" sizes="32x32" href="../img/favicon-32.png" />
+  <link rel="preload" href="../fonts/KalamehWeb-FaNum-Black.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="../fonts/KalamehWeb-FaNum-Regular.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="../common/abadis-common.css" />
+  <style>
+
+    .fl-sec { background: linear-gradient(180deg, #f7fbfb 0%, #edf6f6 60%); }
+    [data-theme="dark"] .fl-sec { background: linear-gradient(180deg, #071d20 0%, #0a2427 60%); }
+    #calc1 .calc-track { height: 430vh; }
+    #calc2 .calc-track { height: 680vh; }
+    .calc-pin { padding: 0; }
+    .fl-top { position: absolute; z-index: 1; top: 0; left: 0; right: 0; padding: 92px 24px 0; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .fl-top h2 { font-size: 1.05rem; font-weight: 800; color: var(--muted); }
+    .fl-big { display: flex; justify-content: center; align-items: baseline; gap: 4vw; }
+    .fl-big .odo { font-size: clamp(4.6rem, 11vw, 9rem); color: var(--teal-dark); line-height: var(--cell); }
+    [data-theme="dark"] .fl-big .odo { color: #e6f3f3; }
+    #calc2 .fl-big .odo { font-size: clamp(3rem, 7vw, 5.6rem); }
+    .fl-in { display: flex; flex-direction: column; align-items: center; transition: opacity .3s; }
+    .fl-in.idle { opacity: .45; }
+    .fl-in .lb { font-size: .9rem; font-weight: 800; color: var(--muted); display: inline-flex; gap: 8px; align-items: center; }
+    .fl-in .hold { font-size: .62rem; font-weight: 800; background: var(--accent); color: #072326; border-radius: 999px; padding: 0 7px; opacity: 0; transition: opacity .3s; }
+    .fl-in.held .hold { opacity: 1; }
+    .fl-hint { font-size: .78rem; color: var(--muted); margin-top: 2px; }
+    .fl-top .chips { margin-top: 8px; justify-content: center; max-width: 100%; }
+    .fl-top .chip { background: transparent; }
+    .fl-top .confirm { margin-top: 6px; }
+    .sea { position: absolute; z-index: 2; left: 0; right: 0; top: 0; bottom: 0; transform: translateY(78%); transition: transform .5s cubic-bezier(.2,.75,.25,1); will-change: transform; pointer-events: none; }
+    .sea .waves { position: absolute; left: -100%; top: -38px; width: 200%; height: 40px; animation: drift 9s linear infinite; }
+    .sea .waves.w2 { animation-duration: 6s; animation-direction: reverse; top: -30px; }
+    @keyframes drift { to { transform: translateX(50%); } }
+    .sea .body { position: absolute; inset: 0; background: linear-gradient(180deg, #3fcbd0 0%, #149aa0 30%, #05686b 75%); }
+    [data-theme="dark"] .sea .body { background: linear-gradient(180deg, #1aa6ab 0%, #0b6f74 30%, #043d40 75%); }
+    .sea .body::before { content: ""; position: absolute; inset: 0; background: radial-gradient(40% 20% at 20% 18%, rgba(255,255,255,.16), transparent 70%), radial-gradient(30% 16% at 80% 34%, rgba(255,255,255,.10), transparent 70%), repeating-linear-gradient(180deg, rgba(255,255,255,.05) 0 2px, transparent 2px 22px); }
+    .bubbles span { position: absolute; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.5); animation: rise 7s ease-in infinite; }
+    @keyframes rise { 0% { transform: translateY(40px); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(-120px); opacity: 0; } }
+    .floats { position: absolute; left: 0; right: 0; top: -30px; display: flex; justify-content: center; align-items: flex-start; gap: 4vw; padding: 0 20px; }
+    .buoy { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; animation: bob 4.2s ease-in-out infinite; }
+    .buoy:nth-child(2) { animation-delay: -1.4s; } .buoy:nth-child(3) { animation-delay: -2.8s; }
+    @keyframes bob { 50% { transform: translateY(5px) rotate(-1deg); } }
+    .buoy .tag { background: #fff; border-radius: 18px; padding: 6px 18px 4px; box-shadow: 0 14px 30px rgba(5,60,62,.22), inset 0 -3px 0 rgba(5,104,107,.12); display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+    [data-theme="dark"] .buoy .tag { background: #0f3337; box-shadow: 0 14px 30px rgba(0,0,0,.4), inset 0 0 0 1px rgba(46,196,198,.3); }
+    .buoy .tag i { width: 28px; height: 28px; border-radius: 9px; display: grid; place-items: center; background: rgba(46,196,198,.16); color: var(--teal); flex: none; }
+    [data-theme="dark"] .buoy .tag i { color: #2ec4c6; }
+    .buoy .tag i svg { width: 17px; height: 17px; }
+    .buoy .odo { font-size: 1.7rem; color: var(--ink); }
+    [data-theme="dark"] .buoy .odo { color: #2ec4c6; }
+    .buoy .u { font-size: .82rem; font-weight: 800; color: var(--muted); }
+    .buoy .cap { margin-top: 12px; font-size: .84rem; font-weight: 800; color: #fff; }
+    .buoy .eq { font-size: .76rem; color: rgba(255,255,255,.82); min-height: 1.3em; }
+    .fl-foot { position: absolute; z-index: 3; left: 0; right: 0; bottom: 22px; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 0 16px; text-align: center; }
+    .fl-sum { font-size: .82rem; color: #fff; max-width: 720px; line-height: 1.7; text-shadow: 0 1px 2px rgba(0,0,0,.25); }
+    .fl-sum b { font-weight: 900; color: #e9fdfd; }
+    .fl-foot .hero-btn { background: #fff; color: #05686b; box-shadow: 0 10px 30px rgba(0,0,0,.18); }
+    [data-theme="dark"] .fl-foot .hero-btn { background: #2ec4c6; color: #072326; }
+    .fl-foot .note { font-size: .7rem; color: rgba(255,255,255,.78); }
+    @media (max-width: 860px) {
+      .fl-top { padding-top: 70px; padding-left: 12px; padding-right: 12px; }
+      .fl-top h2 { font-size: .84rem; }
+      .fl-big .odo { font-size: 4.4rem; }
+      #calc2 .fl-big .odo { font-size: 2.7rem; }
+      .fl-big { gap: 26px; }
+      .fl-in .lb { font-size: .72rem; }
+      .fl-hint { font-size: .68rem; }
+      .floats { gap: 6px; padding: 0 6px; top: -38px; }
+      .buoy .tag { flex-direction: column; gap: 0; padding: 5px 10px 3px; border-radius: 14px; }
+      .buoy .tag i { display: none; }
+      .buoy .odo { font-size: 1.02rem; }
+      .buoy .u { font-size: .6rem; }
+      .buoy .cap { margin-top: 8px; font-size: .62rem; }
+      .buoy .eq { font-size: .56rem; }
+      .fl-foot { bottom: 14px; gap: 6px; }
+      .fl-sum { font-size: .66rem; line-height: 1.6; }
+      .fl-foot .hero-btn { padding: 10px 20px; font-size: .82rem; }
+      .fl-foot .note { font-size: .6rem; }
+    }
+    @media (prefers-reduced-motion: reduce) { .sea { transition: none; } }
+
+  </style>
+</head>
+<body>
+
+  <header class="header" id="header">
+    <a class="logo" href="#top">آبادیس<span>مخازن طبی</span></a>
+    <nav class="nav">
+      <a href="#calc1">بر مبنای تعداد عمل جراحی</a>
+      <a href="#calc2">بر مبنای تعداد تخت</a>
+      <a href="#contact">ارتباط با ما</a>
+    </nav>
+    <div class="header-actions">
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="حالت شب" title="حالت شب" aria-pressed="false">
+        <svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z"/></svg>
+        <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>
+      </button>
+      <a class="header-cta" href="tel:02192001017">تماس با فروش</a>
+    </div>
+  </header>
+
+  <section class="intro" id="top">
+    <div class="eyebrow">ابزار محاسبه · طرح سیلاب</div>
+    <h1>صرفه‌جویی که <em>بالا می‌آید</em></h1>
+    <p>اسکرول کنید؛ سطح آب صرفه‌جویی‌شده بالا می‌آید و اعداد روی آب شناور می‌شوند.</p>
+  </section>
+
+  <section class="calc fl-sec" id="calc1" aria-labelledby="calc1-t">
+    <div class="calc-track"><div class="calc-pin">
+      <div class="fl-top"><h2 id="calc1-t">بر مبنای تعداد عمل جراحی در سال</h2><div class="fl-big"><div class="fl-in"><span class="odo" data-odo="n" data-digits="5"></span><span class="lb">عمل جراحی در سال</span></div></div><p class="fl-hint" data-hint>اسکرول کنید تا آب صرفه‌جویی‌شده بالا بیاید</p><div class="chips" role="group" aria-label="مقادیر آماده">
+              <button class="chip" type="button" data-n="1000">۱٬۰۰۰</button>
+              <button class="chip" type="button" data-n="5000">۵٬۰۰۰</button>
+              <button class="chip" type="button" data-n="10000">۱۰٬۰۰۰</button>
+              <button class="chip" type="button" data-n="15000">۱۵٬۰۰۰</button>
+              <button class="chip" type="button" data-n="30000">۳۰٬۰۰۰</button>
+            </div></div>
+      <div class="sea" aria-hidden="false">
+        <svg class="waves" viewBox="0 0 2880 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 22 C120 6 240 6 360 20 S600 36 720 22 S960 6 1080 20 S1320 36 1440 22 C1560 6 1680 6 1800 20 S2040 36 2160 22 S2400 6 2520 20 S2760 36 2880 22 V40 H0 Z" fill="#7fe3f0" opacity=".5"/></svg>
+        <svg class="waves w2" viewBox="0 0 2880 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 22 C160 8 280 10 400 22 S640 34 780 22 S1040 8 1180 20 S1360 32 1440 22 C1600 8 1720 10 1840 22 S2080 34 2220 22 S2480 8 2620 20 S2800 32 2880 22 V40 H0 Z" fill="#3fcbd0"/></svg>
+        <div class="body"></div>
+        <div class="bubbles" aria-hidden="true"><span style="width:14px;height:14px;left:12%;top:40%"></span><span style="width:8px;height:8px;left:16%;top:32%;animation-delay:-2s"></span><span style="width:10px;height:10px;right:18%;top:44%;animation-delay:-4s"></span><span style="width:6px;height:6px;right:22%;top:36%;animation-delay:-1s"></span><span style="width:12px;height:12px;left:46%;top:52%;animation-delay:-5s"></span></div>
+        <div class="floats">
+          <div class="buoy"><div class="tag"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3s6 6.6 6 11a6 6 0 0 1-12 0c0-4.4 6-11 6-11z"/></svg></i><span class="odo" data-odo="water" data-digits="7"></span><span class="u">لیتر</span></div><span class="cap">صرفه‌جویی آب</span><span class="eq" data-sub="tubs"></span></div>
+          <div class="buoy"><div class="tag"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/></svg></i><span class="odo" data-odo="cost" data-digits="13"></span><span class="u">تومان</span></div><span class="cap">هزینه شست‌وشو و ضدعفونی</span><span class="eq" data-sub="read"></span></div>
+          <div class="buoy"><div class="tag"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></i><span class="odo" data-odo="hours" data-digits="6"></span><span class="u">ساعت</span></div><span class="cap">زمان کادر درمان</span><span class="eq" data-sub="shifts"></span></div>
+        </div>
+      </div>
+      <div class="fl-foot"><p class="fl-sum" data-sum></p><a class="hero-btn" href="tel:02192001017">مشاوره با کارشناس فروش</a><p class="note">* محاسبات بر اساس فرمول‌های محاسبه‌گر فعلی آبادیس</p></div>
+    </div></div>
+  </section>
+
+  <section class="calc fl-sec" id="calc2" aria-labelledby="calc2-t">
+    <div class="calc-track"><div class="calc-pin">
+      <div class="fl-top"><h2 id="calc2-t">بر مبنای تعداد تخت</h2><div class="fl-big"><div class="fl-in" data-ch="a"><span class="odo" data-odo="a" data-digits="3"></span><span class="lb">تخت اتاق عمل <span class="hold">ثابت</span></span></div><div class="fl-in" data-ch="b"><span class="odo" data-odo="b" data-digits="3"></span><span class="lb">تخت ICU|CCU</span></div></div><p class="fl-hint" data-hint>مرحله ۱: با اسکرول، تعداد تخت اتاق عمل را تنظیم کنید</p><div class="chips" role="group" aria-label="ترکیب‌های آماده (تخت اتاق عمل + ICU|CCU)">
+              <button class="chip" type="button" data-a="10" data-b="10">۱۰ + ۱۰</button>
+              <button class="chip" type="button" data-a="20" data-b="10">۲۰ + ۱۰</button>
+              <button class="chip" type="button" data-a="50" data-b="20">۵۰ + ۲۰</button>
+              <button class="chip" type="button" data-a="100" data-b="50">۱۰۰ + ۵۰</button>
+              <button class="chip" type="button" data-a="300" data-b="100">۳۰۰ + ۱۰۰</button>
+              <button class="chip" type="button" data-a="700" data-b="700">۷۰۰ + ۷۰۰</button>
+            </div><button class="confirm" type="button" data-confirm hidden></button></div>
+      <div class="sea" aria-hidden="false">
+        <svg class="waves" viewBox="0 0 2880 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 22 C120 6 240 6 360 20 S600 36 720 22 S960 6 1080 20 S1320 36 1440 22 C1560 6 1680 6 1800 20 S2040 36 2160 22 S2400 6 2520 20 S2760 36 2880 22 V40 H0 Z" fill="#7fe3f0" opacity=".5"/></svg>
+        <svg class="waves w2" viewBox="0 0 2880 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 22 C160 8 280 10 400 22 S640 34 780 22 S1040 8 1180 20 S1360 32 1440 22 C1600 8 1720 10 1840 22 S2080 34 2220 22 S2480 8 2620 20 S2800 32 2880 22 V40 H0 Z" fill="#3fcbd0"/></svg>
+        <div class="body"></div>
+        <div class="bubbles" aria-hidden="true"><span style="width:14px;height:14px;left:12%;top:40%"></span><span style="width:8px;height:8px;left:16%;top:32%;animation-delay:-2s"></span><span style="width:10px;height:10px;right:18%;top:44%;animation-delay:-4s"></span><span style="width:6px;height:6px;right:22%;top:36%;animation-delay:-1s"></span><span style="width:12px;height:12px;left:46%;top:52%;animation-delay:-5s"></span></div>
+        <div class="floats">
+          <div class="buoy"><div class="tag"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3s6 6.6 6 11a6 6 0 0 1-12 0c0-4.4 6-11 6-11z"/></svg></i><span class="odo" data-odo="water" data-digits="7"></span><span class="u">لیتر</span></div><span class="cap">صرفه‌جویی آب</span><span class="eq" data-sub="tubs"></span></div>
+          <div class="buoy"><div class="tag"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/></svg></i><span class="odo" data-odo="cost" data-digits="11"></span><span class="u">تومان</span></div><span class="cap">هزینه شست‌وشو و ضدعفونی</span><span class="eq" data-sub="read"></span></div>
+          <div class="buoy"><div class="tag"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></i><span class="odo" data-odo="hours" data-digits="6"></span><span class="u">ساعت</span></div><span class="cap">زمان کادر درمان</span><span class="eq" data-sub="shifts"></span></div>
+        </div>
+      </div>
+      <div class="fl-foot"><p class="fl-sum" data-sum></p><a class="hero-btn" href="tel:02192001017">مشاوره با کارشناس فروش</a><p class="note">* محاسبات بر اساس فرمول‌های محاسبه‌گر فعلی آبادیس</p></div>
+    </div></div>
+  </section>
+
+  <p class="foot-note"><b>*</b> محاسبات بر اساس فرمول‌های محاسبه‌گر فعلی آبادیس</p>
+
+  <section class="cta-band">
+    <h2>برای محاسبه دقیق مرکز درمانی خود با ما صحبت کنید</h2>
+    <p>کارشناسان فروش مخازن طبی آبادیس آماده پاسخ‌گویی به پرسش‌های شما هستند.</p>
+    <a class="hero-btn" href="tel:02192001017">مشاوره با کارشناس فروش</a>
+    <p class="cta-sub">مرکز تماس: <a href="tel:02192001017" dir="ltr">021-92001017</a> · <a href="https://abadis-med.com/ارتباط-با-ما/" target="_blank" rel="noopener">صفحه ارتباط با ما</a></p>
+  </section>
+
+  <footer class="site-footer" id="contact">
+    <div class="foot-inner">
+      <div class="foot-brand">
+        <strong>مخازن طبی آبادیس</strong>
+        <span>با ما در ارتباط باشید...</span>
+        <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;align-items:flex-start">
+          <a href="https://abadis-med.com/ارتباط-با-ما/" target="_blank" rel="noopener">صفحه ارتباط با ما</a>
+          <a href="https://abadis-med.com/" target="_blank" rel="noopener">abadis-med.com</a>
+        </div>
+      </div>
+      <div>
+        <h3>تماس</h3>
+        <dl>
+          <dt>مرکز تماس:</dt><dd><a href="tel:+982192001017" dir="ltr">02192001017</a></dd>
+          <dt>تلفن تماس:</dt><dd><a href="tel:+982122671845" dir="ltr">02122671845</a> | <a href="tel:+982122205502" dir="ltr">02122205502</a><br><a href="tel:+982122215503" dir="ltr">02122215503</a> | <a href="tel:+982122218910" dir="ltr">02122218910</a></dd>
+          <dt>فکس:</dt><dd><span dir="ltr">02141425555</span> | داخلی 28544</dd>
+          <dt>پست الکترونیک:</dt><dd><a href="mailto:info@abadis-med.com">info@abadis-med.com</a></dd>
+          <dt>واتس‌اپ:</dt><dd><a href="https://wa.me/989100145809" target="_blank" rel="noopener" dir="ltr">+989100145809</a></dd>
+        </dl>
+      </div>
+      <div>
+        <h3>نشانی</h3>
+        <p><b>نشانی دفتر مرکزی:</b><br>ایران، تهران، قیطریه، خیابان اندرزگو، پلاک 104، واحد2</p>
+        <p><b>نشانی کارخانه:</b><br>ایران،تهران،شهرک صنعتی شمس آباد، بلوار گلستان، کوچه گلشن ۱۹،پلاک۱۷</p>
+      </div>
+    </div>
+    <div class="foot-copy">مخازن طبی آبادیس · محاسبه‌گر صرفه‌جویی · طرح سیلاب</div>
+  </footer>
+
+  <script src="../common/abadis-common.js"></script>
+  <script>
+
+    (() => {
+      const A = Abadis, fa = A.fa;
+      function setup(root, kind) {
+        const sea = root.querySelector('.sea'), sum = root.querySelector('[data-sum]'), hint = root.querySelector('[data-hint]');
+        const sub = {}; root.querySelectorAll('[data-sub]').forEach((e) => { sub[e.dataset.sub] = e; });
+        const chA = root.querySelector('[data-ch="a"]'), chB = root.querySelector('[data-ch="b"]');
+        return A.createCalc(root, kind, (s) => {
+          const f = kind === 'surgery' ? s.fr.input : s.fr.water;
+          const mob = innerWidth <= 860;
+          const lo = mob ? 30 : 24, hi = mob ? 57 : 60;   // water height in % of screen
+          const level = lo + (hi - lo) * Math.min(1, f);
+          sea.style.transform = 'translateY(' + (100 - level).toFixed(2) + '%)';
+          sub.tubs.textContent = s.W > 0 ? '≈ ' + fa(s.W / 200) + ' وان ۲۰۰ لیتری (تقریبی)' : '';
+          sub.read.textContent = s.C >= 1e6 ? '≈ ' + A.readableToman(s.C) : '';
+          sub.shifts.textContent = s.H > 0 ? '≈ ' + fa(s.H / 8) + ' شیفت کاری ۸ ساعته' : '';
+          if (kind === 'surgery') {
+            sum.innerHTML = s.disp.n > 0 ? 'با <b>' + fa(s.disp.n) + '</b> عمل جراحی در سال: <b>' + fa(s.W) + '</b> لیتر آب، <b>' + fa(s.C) + '</b> تومان هزینه شست‌وشو و ضدعفونی و <b>' + fa(s.H) + '</b> ساعت از زمان کادر درمان.' : '';
+          } else {
+            chA.classList.toggle('idle', s.phase === 'b'); chB.classList.toggle('idle', s.phase === 'a');
+            chA.classList.toggle('held', s.phase === 'b' || s.lockedA != null);
+            hint.textContent = s.phase === 'a' ? (s.lockedA != null ? 'تخت اتاق عمل روی ' + fa(s.lockedA) + ' ثابت است' : 'مرحله ۱: با اسکرول، تعداد تخت اتاق عمل را تنظیم کنید') : 'مرحله ۲: با اسکرول، تعداد تخت ICU|CCU را تنظیم کنید';
+            sum.innerHTML = (s.disp.a + s.disp.b) > 0 ? 'با <b>' + fa(s.disp.a) + '</b> تخت اتاق عمل و <b>' + fa(s.disp.b) + '</b> تخت ICU|CCU: <b>' + fa(s.W) + '</b> لیتر آب، <b>' + fa(s.C) + '</b> تومان هزینه شست‌وشو و ضدعفونی و <b>' + fa(s.H) + '</b> ساعت از زمان کادر درمان.' : '';
+          }
+        });
+      }
+      setup(document.getElementById('calc1'), 'surgery');
+      setup(document.getElementById('calc2'), 'beds');
+      A.start();
+    })();
+
+  </script>
+</body>
+</html>

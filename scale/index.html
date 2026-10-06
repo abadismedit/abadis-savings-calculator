@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>محاسبه‌گر صرفه‌جویی آبادیس — طرح ترازو</title>
+  <meta name="description" content="محاسبه‌گر صرفه‌جویی آبادیس (طرح ترازو): با اسکرول، صرفه‌جویی در مصرف آب، هزینه شست‌وشو و ضدعفونی و زمان کادر درمان را ببینید." />
+  <meta name="theme-color" content="#e8f3f3" />
+  <script>
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem('abadis-theme'); } catch (e) {}
+      if (t !== 'dark' && t !== 'light') t = (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <link rel="icon" type="image/png" sizes="32x32" href="../img/favicon-32.png" />
+  <link rel="preload" href="../fonts/KalamehWeb-FaNum-Black.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="../fonts/KalamehWeb-FaNum-Regular.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="../common/abadis-common.css" />
+  <style>
+
+    .sc-sec { background: radial-gradient(50% 45% at 50% 45%, rgba(46,196,198,.12), transparent 70%), var(--bg); }
+    #calc1 .calc-track { height: 430vh; }
+    #calc2 .calc-track { height: 680vh; }
+    .calc-pin { padding: 80px 32px 16px; }
+    .sc { height: 100%; max-width: 1180px; margin: 0 auto; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; gap: 8px; }
+    .sc-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 10px 20px; flex-wrap: wrap; }
+    .sc-head h2 { font-size: clamp(1.1rem, 2.3vw, 1.7rem); font-weight: 900; line-height: 1.35; }
+    .sc-hint { color: var(--muted); font-size: .82rem; }
+    .sc-ctl { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+    .sc-in { display: flex; align-items: baseline; gap: 18px; }
+    .inp { display: inline-flex; align-items: baseline; gap: 8px; font-size: .82rem; font-weight: 800; color: var(--muted); transition: opacity .3s; }
+    .inp .odo { font-size: 3.2rem; color: var(--teal); }
+    [data-theme="dark"] .inp .odo { color: #2ec4c6; }
+    #calc2 .inp .odo { font-size: 2.4rem; }
+    .inp.idle { opacity: .55; }
+    .inp .hold { font-size: .62rem; font-weight: 800; background: var(--accent); color: #072326; border-radius: 999px; padding: 0 7px; opacity: 0; transition: opacity .3s; }
+    .inp.held .hold { opacity: 1; }
+    .sc-stage { position: relative; min-height: 0; display: flex; justify-content: center; align-items: center; }
+    .sc-stage svg { height: 100%; width: auto; max-width: 100%; overflow: visible; font-family: var(--font); }
+    .s-metal-stroke { stroke: #8aa2a6; }
+    .s-string { stroke: #7b9497; stroke-width: 2.5; fill: none; }
+    [data-theme="dark"] .s-string { stroke: #5d7b7e; }
+    .s-arc { fill: none; stroke: rgba(5,104,107,.28); stroke-width: 3; stroke-dasharray: 2 8; stroke-linecap: round; }
+    [data-theme="dark"] .s-arc { stroke: rgba(46,196,198,.35); }
+    .s-needle { fill: #05686b; } [data-theme="dark"] .s-needle { fill: #2ec4c6; }
+    .s-lbl-a { fill: #05686b; } [data-theme="dark"] .s-lbl-a { fill: #2ec4c6; }
+    .s-lbl-a-t { fill: #fff; } [data-theme="dark"] .s-lbl-a-t { fill: #072326; }
+    .s-sub { fill: #05686b; } [data-theme="dark"] .s-sub { fill: #8fd9da; }
+    .s-lbl-r { fill: #fff; stroke: rgba(90,117,120,.35); } [data-theme="dark"] .s-lbl-r { fill: #0d2a2e; stroke: rgba(168,213,214,.3); }
+    .s-lbl-r-t { fill: #5a7578; } [data-theme="dark"] .s-lbl-r-t { fill: #9dbdbf; }
+    .s-can { stroke: #7b9497; } [data-theme="dark"] .s-can { stroke: #8fb0b3; }
+    .s-wt-dark { fill: #0b2e32; } [data-theme="dark"] .s-wt-dark { fill: #e6f3f3; }
+    [data-theme="dark"] .s-wt-dark-s { stroke: #e6f3f3 !important; }
+    .s-shadow-stop { stop-color: #0b2e32; } [data-theme="dark"] .s-shadow-stop { stop-color: #000; }
+    .wt { transform: translateY(-150px); opacity: 0; transition: transform .55s cubic-bezier(.3,1.45,.55,1), opacity .25s; }
+    .wt.on { transform: none; opacity: 1; }
+    .reads { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+    .rd { background: var(--card); border: 1px solid var(--card-b); border-radius: 18px; padding: 10px 16px; box-shadow: var(--shadow); display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0 12px; align-items: center; }
+    .rd i { grid-row: span 3; width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; background: rgba(46,196,198,.14); color: var(--teal); }
+    [data-theme="dark"] .rd i { color: #2ec4c6; }
+    .rd i svg { width: 24px; height: 24px; }
+    .rd .l { font-size: .78rem; font-weight: 800; color: var(--muted); }
+    .rd .v { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+    .rd .v .odo { font-size: 1.55rem; color: var(--teal); }
+    [data-theme="dark"] .rd .v .odo { color: #2ec4c6; }
+    .rd .v small { font-size: .8rem; color: var(--muted); font-weight: 800; }
+    .rd .s { font-size: .74rem; color: var(--ink); opacity: .78; min-height: 1.3em; }
+    .sc-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 10px; }
+    .sc-sum { font-size: .84rem; line-height: 1.7; color: var(--ink); }
+    .sc-sum b { color: var(--teal); font-weight: 900; } [data-theme="dark"] .sc-sum b { color: #2ec4c6; }
+    .sc-sum .note { display: block; font-size: .7rem; color: var(--muted); }
+    .sc-foot .hero-btn { padding: 10px 20px; font-size: .84rem; }
+    @media (max-width: 860px) {
+      .calc-pin { padding: 60px 12px 10px; }
+      .sc { gap: 6px; }
+      .sc-head { flex-direction: column; align-items: stretch; gap: 2px; }
+      .sc-head h2 { font-size: 1.04rem; }
+      .sc-hint { font-size: .7rem; }
+      .sc-ctl { align-items: stretch; gap: 4px; }
+      .sc-in { gap: 14px; }
+      .inp { font-size: .7rem; }
+      .inp .odo { font-size: 2.3rem; }
+      #calc2 .inp .odo { font-size: 1.6rem; }
+      .sc-stage { margin: 0 -12px; overflow: hidden; }
+      .sc-stage svg { width: 104%; max-width: none; height: auto; max-height: 100%; flex: none; }
+      .reads { grid-template-columns: minmax(0, 1fr); gap: 5px; }
+      .rd { padding: 5px 12px; border-radius: 14px; gap: 0 10px; }
+      .rd i { width: 36px; height: 36px; border-radius: 11px; }
+      .rd i svg { width: 20px; height: 20px; }
+      .rd .v .odo { font-size: 1.15rem; }
+      .rd .l, .rd .s { font-size: .64rem; }
+      .sc-foot { margin-top: 5px; }
+      .sc-sum { font-size: .66rem; line-height: 1.55; }
+      .sc-sum .note { display: none; }
+      .sc-foot .hero-btn { padding: 8px 12px; font-size: .72rem; }
+    }
+    @media (max-width: 860px) and (max-height: 760px) { .rd .s { display: none; } }
+    @media (prefers-reduced-motion: reduce) { .wt { transition: none; } }
+
+  </style>
+</head>
+<body>
+
+  <header class="header" id="header">
+    <a class="logo" href="#top">آبادیس<span>مخازن طبی</span></a>
+    <nav class="nav">
+      <a href="#calc1">بر مبنای تعداد عمل جراحی</a>
+      <a href="#calc2">بر مبنای تعداد تخت</a>
+      <a href="#contact">ارتباط با ما</a>
+    </nav>
+    <div class="header-actions">
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="حالت شب" title="حالت شب" aria-pressed="false">
+        <svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z"/></svg>
+        <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>
+      </button>
+      <a class="header-cta" href="tel:02192001017">تماس با فروش</a>
+    </div>
+  </header>
+
+  <section class="intro" id="top">
+    <div class="eyebrow">ابزار محاسبه · طرح ترازو</div>
+    <h1>ترازوی صرفه‌جویی <em>آبادیس</em></h1>
+    <p>اسکرول کنید؛ هرچه صرفه‌جویی بیشتر شود، کفهٔ کیسه ساکشن آبادیس سنگین‌تر می‌شود و ترازو بیشتر کج می‌شود.</p>
+  </section>
+
+  <section class="calc sc-sec" id="calc1" aria-labelledby="calc1-t">
+    <div class="calc-track"><div class="calc-pin"><div class="sc">
+      <div class="sc-head">
+        <div><h2 id="calc1-t">بر مبنای تعداد عمل جراحی در سال</h2><p class="sc-hint" data-hint>اسکرول کنید: صرفه‌جویی، کفهٔ آبادیس را سنگین‌تر می‌کند</p></div>
+        <div class="sc-ctl"><div class="sc-in"><span class="inp"><span class="odo" data-odo="n" data-digits="5"></span>عمل جراحی در سال</span></div><div class="chips" role="group" aria-label="مقادیر آماده">
+              <button class="chip" type="button" data-n="1000">۱٬۰۰۰</button>
+              <button class="chip" type="button" data-n="5000">۵٬۰۰۰</button>
+              <button class="chip" type="button" data-n="10000">۱۰٬۰۰۰</button>
+              <button class="chip" type="button" data-n="15000">۱۵٬۰۰۰</button>
+              <button class="chip" type="button" data-n="30000">۳۰٬۰۰۰</button>
+            </div></div>
+      </div>
+      <div class="sc-stage"><svg viewBox="0 0 1000 560" aria-hidden="true">
+          <defs>
+            <linearGradient id="metal-calc1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9f1f2"/><stop offset=".5" stop-color="#b7c8cb"/><stop offset="1" stop-color="#8aa2a6"/></linearGradient>
+            <linearGradient id="metalH-calc1" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9db2b5"/><stop offset=".45" stop-color="#f4f8f8"/><stop offset="1" stop-color="#9db2b5"/></linearGradient>
+            <linearGradient id="teal-calc1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2ec4c6"/><stop offset="1" stop-color="#05686b"/></linearGradient>
+            <radialGradient id="sh-calc1" cx=".5" cy=".5" r=".5"><stop offset="0" class="s-shadow-stop" stop-opacity=".2"/><stop offset="1" class="s-shadow-stop" stop-opacity="0"/></radialGradient>
+          </defs>
+          <ellipse cx="500" cy="540" rx="230" ry="16" fill="url(#sh-calc1)"/>
+          <path d="M400 536 Q500 500 600 536 Z" fill="url(#metal-calc1)" class="s-metal-stroke"/>
+          <rect x="488" y="150" width="24" height="372" rx="8" fill="url(#metalH-calc1)" class="s-metal-stroke"/>
+          <rect x="470" y="508" width="60" height="18" rx="6" fill="url(#metal-calc1)"/>
+          <path class="s-arc" d="M420 92 A90 90 0 0 1 580 92"/>
+          <g class="beam">
+            <rect x="160" y="140" width="680" height="20" rx="10" fill="url(#metal-calc1)" class="s-metal-stroke"/>
+            <rect x="180" y="144" width="640" height="4" rx="2" fill="#fff" opacity=".7"/>
+            <circle cx="170" cy="150" r="13" fill="url(#metal-calc1)" class="s-metal-stroke"/><circle cx="830" cy="150" r="13" fill="url(#metal-calc1)" class="s-metal-stroke"/>
+            <path class="s-needle" d="M500 150 L493 70 L500 56 L507 70 Z"/>
+          </g>
+          <circle cx="500" cy="150" r="22" fill="url(#teal-calc1)" stroke="#fff" stroke-width="4"/>
+          <text x="500" y="157" text-anchor="middle" font-size="17" font-weight="900" fill="#fff">آ</text>
+          <g class="pan pan-a" transform="translate(170 150)">
+            <path class="s-string" d="M0 0 L-80 187 M0 0 L80 187"/><circle r="7" fill="#05686b"/>
+            <path d="M-100 187 L100 187 Q90 231 0 233 Q-90 231 -100 187 Z" fill="url(#teal-calc1)" stroke="#05686b"/>
+            <ellipse cy="187" rx="100" ry="11" fill="#7fe3f0" stroke="#05686b"/>
+            <g class="wt" data-wt="0"><g class="wt-s" data-bx="-42" data-by="185"><path class="s-wt-dark" d="M-72 185 L-62 129 L-22 129 L-12 185 Z"/><path class="s-wt-dark-s" d="M-54 129 Q-42 109 -30 129" fill="none" stroke="#0b2e32" stroke-width="7"/><path d="M-42 143 s-9 10 -9 16 a9 9 0 0 0 18 0 c0 -6 -9 -16 -9 -16z" fill="#62d9ff"/></g></g>
+            <g class="wt" data-wt="1"><g class="wt-s" data-bx="27" data-by="185"><path d="M-6 185 L4 117 L50 117 L60 185 Z" fill="#05686b"/><path d="M14 117 Q27 93 40 117" fill="none" stroke="#05686b" stroke-width="7"/><rect x="15" y="139" width="24" height="16" rx="3" fill="none" stroke="#8fe27c" stroke-width="3"/><circle cx="27" cy="147" r="3.5" fill="#8fe27c"/></g></g>
+            <g class="wt" data-wt="2"><g class="wt-s" data-bx="82" data-by="185"><path class="s-wt-dark" d="M64 185 L70 149 L94 149 L100 185 Z"/><path class="s-wt-dark-s" d="M75 149 Q82 135 89 149" fill="none" stroke="#0b2e32" stroke-width="5"/><circle cx="82" cy="168" r="8" fill="none" stroke="#ffc861" stroke-width="2.6"/><path d="M82 163v5l3 2" stroke="#ffc861" stroke-width="2.2" fill="none"/></g></g>
+            <rect class="s-lbl-a" x="-115" y="247" width="230" height="38" rx="19"/>
+            <text class="s-lbl-a-t" y="272" text-anchor="middle" font-size="19" font-weight="900">کیسه ساکشن آبادیس</text>
+            <text class="s-sub" y="309" text-anchor="middle" font-size="15" font-weight="700">سنگینیِ صرفه‌جویی</text>
+          </g>
+          <g class="pan pan-r" transform="translate(830 150)">
+            <path class="s-string" d="M0 0 L-80 187 M0 0 L80 187"/><circle r="7" fill="#7b9497"/>
+            <path d="M-90 187 L90 187 Q80 227 0 229 Q-80 227 -90 187 Z" fill="url(#metal-calc1)" class="s-metal-stroke"/>
+            <ellipse cy="187" rx="90" ry="10" fill="#eef4f5" class="s-metal-stroke"/>
+            <g><rect class="s-can" x="-22" y="135" width="44" height="50" rx="8" fill="none" stroke-width="3"/><rect x="-16" y="125" width="32" height="12" rx="3" fill="#7b9497"/><path class="s-can" d="M-22 157 h44" stroke-width="2" stroke-dasharray="4 4"/></g>
+            <rect class="s-lbl-r" x="-110" y="247" width="220" height="38" rx="19"/>
+            <text class="s-lbl-r-t" y="272" text-anchor="middle" font-size="19" font-weight="900">مخزن چندبار مصرف</text>
+          </g>
+        </svg></div>
+      <div>
+        <div class="reads">
+          <div class="rd"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3s6 6.6 6 11a6 6 0 0 1-12 0c0-4.4 6-11 6-11z"/></svg></i><span class="l">صرفه‌جویی در مصرف آب</span><span class="v"><span class="odo" data-odo="water" data-digits="7"></span><small>لیتر</small></span><span class="s" data-sub="tubs"></span></div>
+          <div class="rd"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/></svg></i><span class="l">هزینه شست‌وشو و ضدعفونی</span><span class="v"><span class="odo" data-odo="cost" data-digits="13"></span><small>تومان</small></span><span class="s" data-sub="read"></span></div>
+          <div class="rd"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></i><span class="l">زمان کادر درمان</span><span class="v"><span class="odo" data-odo="hours" data-digits="6"></span><small>ساعت</small></span><span class="s" data-sub="shifts"></span></div>
+        </div>
+        <div class="sc-foot"><p class="sc-sum" data-sum></p><a class="hero-btn" href="tel:02192001017">مشاوره با کارشناس فروش</a></div>
+      </div>
+    </div></div></div>
+  </section>
+
+  <section class="calc sc-sec" id="calc2" aria-labelledby="calc2-t">
+    <div class="calc-track"><div class="calc-pin"><div class="sc">
+      <div class="sc-head">
+        <div><h2 id="calc2-t">بر مبنای تعداد تخت</h2><p class="sc-hint" data-hint>مرحله ۱: با اسکرول، تعداد تخت اتاق عمل را تنظیم کنید</p></div>
+        <div class="sc-ctl"><div class="sc-in"><span class="inp" data-ch="a">تخت اتاق عمل <span class="odo" data-odo="a" data-digits="3"></span><span class="hold">ثابت</span></span><span class="inp" data-ch="b">تخت ICU|CCU <span class="odo" data-odo="b" data-digits="3"></span></span></div><div class="chips" role="group" aria-label="ترکیب‌های آماده (تخت اتاق عمل + ICU|CCU)">
+              <button class="chip" type="button" data-a="10" data-b="10">۱۰ + ۱۰</button>
+              <button class="chip" type="button" data-a="20" data-b="10">۲۰ + ۱۰</button>
+              <button class="chip" type="button" data-a="50" data-b="20">۵۰ + ۲۰</button>
+              <button class="chip" type="button" data-a="100" data-b="50">۱۰۰ + ۵۰</button>
+              <button class="chip" type="button" data-a="300" data-b="100">۳۰۰ + ۱۰۰</button>
+              <button class="chip" type="button" data-a="700" data-b="700">۷۰۰ + ۷۰۰</button>
+            </div><button class="confirm" type="button" data-confirm hidden></button></div>
+      </div>
+      <div class="sc-stage"><svg viewBox="0 0 1000 560" aria-hidden="true">
+          <defs>
+            <linearGradient id="metal-calc2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9f1f2"/><stop offset=".5" stop-color="#b7c8cb"/><stop offset="1" stop-color="#8aa2a6"/></linearGradient>
+            <linearGradient id="metalH-calc2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9db2b5"/><stop offset=".45" stop-color="#f4f8f8"/><stop offset="1" stop-color="#9db2b5"/></linearGradient>
+            <linearGradient id="teal-calc2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2ec4c6"/><stop offset="1" stop-color="#05686b"/></linearGradient>
+            <radialGradient id="sh-calc2" cx=".5" cy=".5" r=".5"><stop offset="0" class="s-shadow-stop" stop-opacity=".2"/><stop offset="1" class="s-shadow-stop" stop-opacity="0"/></radialGradient>
+          </defs>
+          <ellipse cx="500" cy="540" rx="230" ry="16" fill="url(#sh-calc2)"/>
+          <path d="M400 536 Q500 500 600 536 Z" fill="url(#metal-calc2)" class="s-metal-stroke"/>
+          <rect x="488" y="150" width="24" height="372" rx="8" fill="url(#metalH-calc2)" class="s-metal-stroke"/>
+          <rect x="470" y="508" width="60" height="18" rx="6" fill="url(#metal-calc2)"/>
+          <path class="s-arc" d="M420 92 A90 90 0 0 1 580 92"/>
+          <g class="beam">
+            <rect x="160" y="140" width="680" height="20" rx="10" fill="url(#metal-calc2)" class="s-metal-stroke"/>
+            <rect x="180" y="144" width="640" height="4" rx="2" fill="#fff" opacity=".7"/>
+            <circle cx="170" cy="150" r="13" fill="url(#metal-calc2)" class="s-metal-stroke"/><circle cx="830" cy="150" r="13" fill="url(#metal-calc2)" class="s-metal-stroke"/>
+            <path class="s-needle" d="M500 150 L493 70 L500 56 L507 70 Z"/>
+          </g>
+          <circle cx="500" cy="150" r="22" fill="url(#teal-calc2)" stroke="#fff" stroke-width="4"/>
+          <text x="500" y="157" text-anchor="middle" font-size="17" font-weight="900" fill="#fff">آ</text>
+          <g class="pan pan-a" transform="translate(170 150)">
+            <path class="s-string" d="M0 0 L-80 187 M0 0 L80 187"/><circle r="7" fill="#05686b"/>
+            <path d="M-100 187 L100 187 Q90 231 0 233 Q-90 231 -100 187 Z" fill="url(#teal-calc2)" stroke="#05686b"/>
+            <ellipse cy="187" rx="100" ry="11" fill="#7fe3f0" stroke="#05686b"/>
+            <g class="wt" data-wt="0"><g class="wt-s" data-bx="-42" data-by="185"><path class="s-wt-dark" d="M-72 185 L-62 129 L-22 129 L-12 185 Z"/><path class="s-wt-dark-s" d="M-54 129 Q-42 109 -30 129" fill="none" stroke="#0b2e32" stroke-width="7"/><path d="M-42 143 s-9 10 -9 16 a9 9 0 0 0 18 0 c0 -6 -9 -16 -9 -16z" fill="#62d9ff"/></g></g>
+            <g class="wt" data-wt="1"><g class="wt-s" data-bx="27" data-by="185"><path d="M-6 185 L4 117 L50 117 L60 185 Z" fill="#05686b"/><path d="M14 117 Q27 93 40 117" fill="none" stroke="#05686b" stroke-width="7"/><rect x="15" y="139" width="24" height="16" rx="3" fill="none" stroke="#8fe27c" stroke-width="3"/><circle cx="27" cy="147" r="3.5" fill="#8fe27c"/></g></g>
+            <g class="wt" data-wt="2"><g class="wt-s" data-bx="82" data-by="185"><path class="s-wt-dark" d="M64 185 L70 149 L94 149 L100 185 Z"/><path class="s-wt-dark-s" d="M75 149 Q82 135 89 149" fill="none" stroke="#0b2e32" stroke-width="5"/><circle cx="82" cy="168" r="8" fill="none" stroke="#ffc861" stroke-width="2.6"/><path d="M82 163v5l3 2" stroke="#ffc861" stroke-width="2.2" fill="none"/></g></g>
+            <rect class="s-lbl-a" x="-115" y="247" width="230" height="38" rx="19"/>
+            <text class="s-lbl-a-t" y="272" text-anchor="middle" font-size="19" font-weight="900">کیسه ساکشن آبادیس</text>
+            <text class="s-sub" y="309" text-anchor="middle" font-size="15" font-weight="700">سنگینیِ صرفه‌جویی</text>
+          </g>
+          <g class="pan pan-r" transform="translate(830 150)">
+            <path class="s-string" d="M0 0 L-80 187 M0 0 L80 187"/><circle r="7" fill="#7b9497"/>
+            <path d="M-90 187 L90 187 Q80 227 0 229 Q-80 227 -90 187 Z" fill="url(#metal-calc2)" class="s-metal-stroke"/>
+            <ellipse cy="187" rx="90" ry="10" fill="#eef4f5" class="s-metal-stroke"/>
+            <g><rect class="s-can" x="-22" y="135" width="44" height="50" rx="8" fill="none" stroke-width="3"/><rect x="-16" y="125" width="32" height="12" rx="3" fill="#7b9497"/><path class="s-can" d="M-22 157 h44" stroke-width="2" stroke-dasharray="4 4"/></g>
+            <rect class="s-lbl-r" x="-110" y="247" width="220" height="38" rx="19"/>
+            <text class="s-lbl-r-t" y="272" text-anchor="middle" font-size="19" font-weight="900">مخزن چندبار مصرف</text>
+          </g>
+        </svg></div>
+      <div>
+        <div class="reads">
+          <div class="rd"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3s6 6.6 6 11a6 6 0 0 1-12 0c0-4.4 6-11 6-11z"/></svg></i><span class="l">صرفه‌جویی در مصرف آب</span><span class="v"><span class="odo" data-odo="water" data-digits="7"></span><small>لیتر</small></span><span class="s" data-sub="tubs"></span></div>
+          <div class="rd"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/></svg></i><span class="l">هزینه شست‌وشو و ضدعفونی</span><span class="v"><span class="odo" data-odo="cost" data-digits="11"></span><small>تومان</small></span><span class="s" data-sub="read"></span></div>
+          <div class="rd"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></i><span class="l">زمان کادر درمان</span><span class="v"><span class="odo" data-odo="hours" data-digits="6"></span><small>ساعت</small></span><span class="s" data-sub="shifts"></span></div>
+        </div>
+        <div class="sc-foot"><p class="sc-sum" data-sum></p><a class="hero-btn" href="tel:02192001017">مشاوره با کارشناس فروش</a></div>
+      </div>
+    </div></div></div>
+  </section>
+
+  <p class="foot-note"><b>*</b> محاسبات بر اساس فرمول‌های محاسبه‌گر فعلی آبادیس</p>
+
+  <section class="cta-band">
+    <h2>برای محاسبه دقیق مرکز درمانی خود با ما صحبت کنید</h2>
+    <p>کارشناسان فروش مخازن طبی آبادیس آماده پاسخ‌گویی به پرسش‌های شما هستند.</p>
+    <a class="hero-btn" href="tel:02192001017">مشاوره با کارشناس فروش</a>
+    <p class="cta-sub">مرکز تماس: <a href="tel:02192001017" dir="ltr">021-92001017</a> · <a href="https://abadis-med.com/ارتباط-با-ما/" target="_blank" rel="noopener">صفحه ارتباط با ما</a></p>
+  </section>
+
+  <footer class="site-footer" id="contact">
+    <div class="foot-inner">
+      <div class="foot-brand">
+        <strong>مخازن طبی آبادیس</strong>
+        <span>با ما در ارتباط باشید...</span>
+        <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;align-items:flex-start">
+          <a href="https://abadis-med.com/ارتباط-با-ما/" target="_blank" rel="noopener">صفحه ارتباط با ما</a>
+          <a href="https://abadis-med.com/" target="_blank" rel="noopener">abadis-med.com</a>
+        </div>
+      </div>
+      <div>
+        <h3>تماس</h3>
+        <dl>
+          <dt>مرکز تماس:</dt><dd><a href="tel:+982192001017" dir="ltr">02192001017</a></dd>
+          <dt>تلفن تماس:</dt><dd><a href="tel:+982122671845" dir="ltr">02122671845</a> | <a href="tel:+982122205502" dir="ltr">02122205502</a><br><a href="tel:+982122215503" dir="ltr">02122215503</a> | <a href="tel:+982122218910" dir="ltr">02122218910</a></dd>
+          <dt>فکس:</dt><dd><span dir="ltr">02141425555</span> | داخلی 28544</dd>
+          <dt>پست الکترونیک:</dt><dd><a href="mailto:info@abadis-med.com">info@abadis-med.com</a></dd>
+          <dt>واتس‌اپ:</dt><dd><a href="https://wa.me/989100145809" target="_blank" rel="noopener" dir="ltr">+989100145809</a></dd>
+        </dl>
+      </div>
+      <div>
+        <h3>نشانی</h3>
+        <p><b>نشانی دفتر مرکزی:</b><br>ایران، تهران، قیطریه، خیابان اندرزگو، پلاک 104، واحد2</p>
+        <p><b>نشانی کارخانه:</b><br>ایران،تهران،شهرک صنعتی شمس آباد، بلوار گلستان، کوچه گلشن ۱۹،پلاک۱۷</p>
+      </div>
+    </div>
+    <div class="foot-copy">مخازن طبی آبادیس · محاسبه‌گر صرفه‌جویی · طرح ترازو</div>
+  </footer>
+
+  <script src="../common/abadis-common.js"></script>
+  <script>
+
+    (() => {
+      const A = Abadis, fa = A.fa;
+      const MAX_TILT = 14, TH = [0, 0.12, 0.3];
+      function setup(root, kind) {
+        const beam = root.querySelector('.beam'), panA = root.querySelector('.pan-a'), panR = root.querySelector('.pan-r');
+        const wts = [...root.querySelectorAll('.wt')], wss = [...root.querySelectorAll('.wt-s')];
+        const sub = {}; root.querySelectorAll('[data-sub]').forEach((e) => { sub[e.dataset.sub] = e; });
+        const sum = root.querySelector('[data-sum]'), hint = root.querySelector('[data-hint]');
+        const chA = root.querySelector('[data-ch="a"]'), chB = root.querySelector('[data-ch="b"]');
+        return A.createCalc(root, kind, (s) => {
+          const f = kind === 'surgery' ? s.fr.input : s.fr.water;
+          const ang = -MAX_TILT * A.visCurve(f), r = ang * Math.PI / 180;
+          beam.setAttribute('transform', 'rotate(' + ang.toFixed(2) + ' 500 150)');
+          const ax = 500 - 330 * Math.cos(r), ay = 150 - 330 * Math.sin(r), bx = 500 + 330 * Math.cos(r), by = 150 + 330 * Math.sin(r);
+          panA.setAttribute('transform', 'translate(' + ax.toFixed(1) + ' ' + ay.toFixed(1) + ')');
+          panR.setAttribute('transform', 'translate(' + bx.toFixed(1) + ' ' + by.toFixed(1) + ')');
+          const sc = 0.78 + 0.32 * Math.min(1, f);
+          wts.forEach((w, i) => w.classList.toggle('on', f > TH[i]));
+          wss.forEach((g) => { const x = +g.dataset.bx, y = +g.dataset.by; g.setAttribute('transform', 'translate(' + x + ' ' + y + ') scale(' + sc.toFixed(3) + ') translate(' + (-x) + ' ' + (-y) + ')'); });
+          sub.tubs.innerHTML = s.W > 0 ? '≈ ' + fa(s.W / 200) + ' وان حمام ۲۰۰ لیتری (تقریبی)' : '&nbsp;';
+          sub.read.innerHTML = s.C >= 1e6 ? '≈ ' + A.readableToman(s.C) : '&nbsp;';
+          sub.shifts.innerHTML = s.H > 0 ? '≈ ' + fa(s.H / 8) + ' شیفت کاری ۸ ساعته' : '&nbsp;';
+          const note = '<span class="note">* محاسبات بر اساس فرمول‌های محاسبه‌گر فعلی آبادیس</span>';
+          if (kind === 'surgery') {
+            sum.innerHTML = s.disp.n > 0 ? 'با <b>' + fa(s.disp.n) + '</b> عمل جراحی در سال، کفهٔ آبادیس <b>' + fa(s.W) + '</b> لیتر آب، <b>' + fa(s.C) + '</b> تومان و <b>' + fa(s.H) + '</b> ساعت سنگین‌تر است.' + note : 'با اسکرول، تعداد عمل جراحی در سال را بالا ببرید.' + note;
+          } else {
+            chA.classList.toggle('idle', s.phase === 'b'); chB.classList.toggle('idle', s.phase === 'a');
+            chA.classList.toggle('held', s.phase === 'b' || s.lockedA != null);
+            hint.textContent = s.phase === 'a' ? (s.lockedA != null ? 'تخت اتاق عمل روی ' + fa(s.lockedA) + ' ثابت است' : 'مرحله ۱: با اسکرول، تعداد تخت اتاق عمل را تنظیم کنید') : 'مرحله ۲: با اسکرول، تعداد تخت ICU|CCU را تنظیم کنید';
+            sum.innerHTML = (s.disp.a + s.disp.b) > 0 ? 'با <b>' + fa(s.disp.a) + '</b> تخت اتاق عمل و <b>' + fa(s.disp.b) + '</b> تخت ICU|CCU، کفهٔ آبادیس <b>' + fa(s.W) + '</b> لیتر آب، <b>' + fa(s.C) + '</b> تومان و <b>' + fa(s.H) + '</b> ساعت سنگین‌تر است.' + note : 'با اسکرول، تعداد تخت اتاق عمل را بالا ببرید.' + note;
+          }
+        });
+      }
+      setup(document.getElementById('calc1'), 'surgery');
+      setup(document.getElementById('calc2'), 'beds');
+      A.start();
+    })();
+
+  </script>
+</body>
+</html>
