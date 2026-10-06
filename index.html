@@ -253,11 +253,30 @@
     @keyframes wave { from { transform: translateX(0); } to { transform: translateX(-60px); } }
     .tank .shine { fill: rgba(255,255,255,0.35); }
 
-    /* coin stacks */
-    .coins { --sx: 84px; --ly: 10px; position: relative; width: 232px; height: 150px; }
-    .coin { position: absolute; width: 64px; height: 19px; border-radius: 50%; background: linear-gradient(180deg, #9fe9ea 0%, #2ec4c6 55%, #0b8d8f 100%); box-shadow: inset 0 -2px 0 rgba(5,104,107,.55), 0 1px 0 rgba(255,255,255,.4) inset; opacity: 0; transform: translateY(-16px) scale(.9); transition: opacity .28s, transform .38s cubic-bezier(.3,1.6,.5,1); }
-    .coin.on { opacity: 1; transform: none; }
-    .coins-base { position: absolute; bottom: -4px; left: 0; right: 0; height: 10px; border-radius: 50%; background: radial-gradient(closest-side, rgba(11,46,50,.18), transparent); }
+    /* banknote stacks (stylised, isometric) */
+    .money-box { position: relative; width: 300px; height: 195px; }
+    .money { position: absolute; left: 50%; top: 50%; width: 232px; height: 150px; transform: translate(-50%, -50%) scale(var(--ms, 1.3)); direction: ltr;
+      --paper1: #e8f3e0; --paper2: #c6dfb8; --note-ink: #4a7a43; --note-line: rgba(74,122,67,.55); --note-edge: #94bb88; --strap: #05686b; --shadow: rgba(11,46,50,.20); }
+    [data-theme="dark"] .money, .calc--dark .money { --paper1: #d6e9cb; --paper2: #aecb9e; --note-ink: #3c6936; --note-line: rgba(60,105,54,.6); --note-edge: #6f9a62; --strap: #2ec4c6; --shadow: rgba(0,0,0,.5); }
+    .stack { position: absolute; width: 120px; height: 150px; bottom: 0; }
+    .stack-0 { left: 9px; bottom: 6px; z-index: 2; }
+    .stack-1 { left: 102px; bottom: 30px; z-index: 1; }
+    .stack-shadow { position: absolute; left: -12px; width: 144px; bottom: -8px; height: 26px; border-radius: 50%; background: radial-gradient(closest-side, var(--shadow), transparent); opacity: 0; transition: opacity .4s; }
+    .stack.has .stack-shadow { opacity: 1; }
+    .bill { position: absolute; left: 0; width: 120px; height: 56px; opacity: 0; transform: translateY(-22px); transition: opacity .3s, transform .45s cubic-bezier(.3,1.5,.5,1); }
+    .bill.on { opacity: 1; transform: none; }
+    .note { position: absolute; inset: 0; box-sizing: border-box; border-radius: 5px; overflow: hidden;
+      transform: scale(1, .5) rotate(35deg);
+      border-right: 3px solid var(--note-edge); border-bottom: 3px solid var(--note-edge);
+      background:
+        radial-gradient(circle at 73% 50%, transparent 0 11px, var(--note-line) 11.5px 12.5px, transparent 13px),
+        repeating-linear-gradient(115deg, rgba(255,255,255,.22) 0 1px, transparent 1px 5px),
+        linear-gradient(135deg, var(--paper1), var(--paper2)); }
+    .note::before { content: ""; position: absolute; inset: 4px; border: 1.2px solid var(--note-line); border-radius: 3px; }
+    .note i { position: absolute; left: calc(73% - 7px); top: calc(50% - 7px); width: 14px; height: 14px; border-radius: 50%;
+      background: radial-gradient(circle, var(--paper1) 0 2.5px, var(--note-ink) 3px 4.5px, var(--paper2) 5px 5.8px, var(--note-ink) 6.2px); }
+    .note b { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 11px; font-weight: 900; line-height: 1; color: var(--note-ink); direction: rtl; }
+    .note u { position: absolute; top: 0; bottom: 0; left: 48%; width: 15px; background: var(--strap); box-shadow: inset 1px 0 0 rgba(255,255,255,.25), inset -1px 0 0 rgba(0,0,0,.15); }
     .money-read { font-size: .82rem; font-weight: 800; color: var(--c-ink); }
 
     /* staff people */
@@ -277,14 +296,19 @@
     .calc-sum .hero-btn { padding: 11px 22px; font-size: .88rem; white-space: nowrap; flex: none; }
 
     /* odometer */
-    .odo { display: inline-flex; direction: ltr; unicode-bidi: isolate; line-height: 1.15; height: 1.15em; overflow: hidden; font-weight: 900; vertical-align: bottom; }
-    .odo-col { display: inline-block; width: .6em; height: 1.15em; overflow: hidden; text-align: center; transition: width .35s, opacity .35s; }
-    .odo-col.off { width: 0; opacity: 0; }
+    /* Kalameh FaNum Black: hhea ascent 1.2 / descent .5; digit ink spans -.044em..+.796em, advances .26em-.77em.
+       A 1.2em cell puts the baseline at .95em, leaving >=.15em above the tallest digit (۵) and ~.2em below the deepest (۶),
+       so a neighbouring digit can never enter the cell. Column width follows each digit's real advance (set in JS). */
+    .odo { --cell: 1.2em; display: inline-flex; direction: ltr; unicode-bidi: isolate; line-height: var(--cell); height: var(--cell); font-weight: 900; vertical-align: bottom; }
+    .odo-col { display: inline-block; position: relative; width: .62em; height: var(--cell); text-align: center; transition: width .55s cubic-bezier(.2,.75,.25,1), opacity .35s; }
+    /* clipping window: exactly one cell tall, a bit wider than the column so wide digits (۵ ۳) never get side-clipped while rolling */
+    .odo-win { position: absolute; top: 0; bottom: 0; left: -.26em; right: -.26em; overflow: hidden; }
+    .odo-col.off { opacity: 0; }
     .odo-strip { display: block; transition: transform .55s cubic-bezier(.2,.75,.25,1); will-change: transform; }
-    .odo-strip span { display: block; height: 1.15em; }
-    .odo-sep { display: inline-block; width: .3em; text-align: center; overflow: hidden; transition: width .35s, opacity .35s; }
+    .odo-strip span { display: block; height: var(--cell); line-height: var(--cell); white-space: nowrap; }
+    .odo-sep { display: inline-block; width: .34em; height: var(--cell); line-height: var(--cell); text-align: center; overflow: hidden; transition: width .35s, opacity .35s; }
     .odo-sep.off { width: 0; opacity: 0; }
-    .no-anim .odo-strip, .no-anim .odo-col, .no-anim .odo-sep, .no-anim .coin, .no-anim .person { transition: none !important; }
+    .no-anim .odo-strip, .no-anim .odo-col, .no-anim .odo-sep, .no-anim .bill, .no-anim .person { transition: none !important; }
 
     .foot-note { text-align: center; color: var(--muted); font-size: .86rem; padding: 28px 24px; background: var(--bg); }
     .foot-note b { color: var(--teal); }
@@ -312,7 +336,7 @@
       .bed .in-label { font-size: .7rem; }
       .confirm { margin-top: 6px; font-size: .74rem; padding: 4px 12px; }
       .outs { grid-template-columns: minmax(0, 1fr); gap: 8px; }
-      .out { display: grid; grid-template-columns: 1fr 76px; grid-template-rows: auto auto auto; column-gap: 12px; padding: 8px 14px; border-radius: 16px; }
+      .out { display: grid; grid-template-columns: 1fr 88px; grid-template-rows: auto auto auto; column-gap: 12px; padding: 8px 14px; border-radius: 16px; }
       .out-vis { grid-column: 2; grid-row: 1 / span 3; min-height: 0; height: 100%; max-height: 112px; align-items: center; }
       .out-label { grid-column: 1; margin-top: 0; font-size: .74rem; }
       .out-val { grid-column: 1; }
@@ -320,8 +344,8 @@
       .out-unit { font-size: .74rem; }
       .out-sub { grid-column: 1; font-size: .72rem; min-height: 0; }
       .tank { max-height: 100px; }
-      .coins { --sx: 27px; --ly: 4px; width: 76px; height: 60px; }
-      .coin { width: 22px; height: 7px; }
+      .money-box { width: 88px; height: 60px; }
+      .money { --ms: .38; }
       .people { grid-template-columns: repeat(5, 1fr); gap: 3px; max-width: 76px; }
       .money-read { font-size: .72rem; }
       .calc-sum { padding: 8px 8px 8px 12px; gap: 8px; border-radius: 14px; }
@@ -340,8 +364,8 @@
       .calc-pin { padding-top: 72px; }
       .in-big { font-size: 3rem; }
       .tank { max-height: min(170px, 100%); }
-      .coins { --sx: 70px; --ly: 8px; width: 192px; height: 120px; }
-      .coin { width: 52px; height: 16px; }
+      .money-box { width: 240px; height: 156px; }
+      .money { --ms: 1.04; }
       .out { padding: 12px 16px; }
     }
 
@@ -380,8 +404,6 @@
     [data-theme="dark"] #calc1 { background: radial-gradient(80% 60% at 15% 10%, #0c3236 0%, #071d20 62%); }
     [data-theme="dark"] .calc { --card: rgba(255,255,255,0.05); }
     [data-theme="dark"] .out, [data-theme="dark"] .calc-input { box-shadow: 0 10px 40px rgba(0,0,0,.25); }
-    [data-theme="dark"] .coin { background: linear-gradient(180deg, #b5f1f2 0%, #3fd0d2 55%, #0f9a9c 100%); box-shadow: inset 0 -2px 0 rgba(3,60,62,.7), 0 1px 0 rgba(255,255,255,.45) inset; }
-    [data-theme="dark"] .coins-base { background: radial-gradient(closest-side, rgba(0,0,0,.45), transparent); }
     [data-theme="dark"] .tank .shine { fill: rgba(255,255,255,0.18); }
     [data-theme="dark"] .foot-note { background: #071d20; color: var(--muted); }
     [data-theme="dark"] .foot-note b { color: #2ec4c6; }
@@ -396,7 +418,7 @@
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
       .hero-waves > div, .scroll-cue i::after, .calc-hint svg, .tank .wave, .tank .wave2 { animation: none !important; }
-      .odo-strip, .odo-col, .odo-sep, .coin, .person, .tank .water, .theme-toggle svg { transition: none !important; }
+      .odo-strip, .odo-col, .odo-sep, .bill, .person, .tank .water, .theme-toggle svg { transition: none !important; }
     }
   </style>
 </head>
@@ -479,7 +501,7 @@
               <div class="out-sub" data-sub="tubs"></div>
             </div>
             <div class="out out--money">
-              <div class="out-vis" data-vis="coins"></div>
+              <div class="out-vis" data-vis="money"></div>
               <div class="out-label">هزینه مربوط به شست‌وشو و ضدعفونی</div>
               <div class="out-val"><span class="odo" data-odo="cost" data-digits="13"></span><span class="out-unit">تومان</span></div>
               <div class="out-sub money-read" data-sub="read"></div>
@@ -542,7 +564,7 @@
               <div class="out-sub" data-sub="tubs"></div>
             </div>
             <div class="out out--money">
-              <div class="out-vis" data-vis="coins"></div>
+              <div class="out-vis" data-vis="money"></div>
               <div class="out-label">هزینه مربوط به شست‌وشو و ضدعفونی</div>
               <div class="out-val"><span class="odo" data-odo="cost" data-digits="11"></span><span class="out-unit">تومان</span></div>
               <div class="out-sub money-read" data-sub="read"></div>

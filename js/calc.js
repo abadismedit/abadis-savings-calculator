@@ -32,6 +32,9 @@
   window.ABADIS_FORMULAS = F; // exposed for verification
 
   /* ---------- rolling-digit odometer ---------- */
+  /* advance widths (em) of Persian digits ۰-۹ in Kalameh FaNum Black, measured from the font file */
+  const DIGIT_ADV = [0.473, 0.264, 0.507, 0.705, 0.621, 0.768, 0.573, 0.641, 0.641, 0.526];
+  const CELL_EM = 1.2, COL_PAD = 0.02;
   class Odo {
     constructor(el, digits) {
       this.el = el; this.digits = digits; this.cols = []; this.seps = []; this.v = -1;
@@ -40,7 +43,8 @@
         const col = document.createElement('span'); col.className = 'odo-col'; col.setAttribute('aria-hidden', 'true');
         const strip = document.createElement('span'); strip.className = 'odo-strip';
         for (let d = 0; d < 10; d++) { const s = document.createElement('span'); s.textContent = FA_DIGITS[d]; strip.appendChild(s); }
-        col.appendChild(strip); frag.appendChild(col);
+        const win = document.createElement('span'); win.className = 'odo-win';
+        win.appendChild(strip); col.appendChild(win); frag.appendChild(col);
         this.cols[i] = { col, strip, d: -1, off: null };
         if (i > 0 && i % 3 === 0) {
           const sep = document.createElement('span'); sep.className = 'odo-sep'; sep.textContent = '٬'; sep.setAttribute('aria-hidden', 'true');
@@ -59,9 +63,11 @@
       for (let i = 0; i < this.digits; i++) {
         const c = this.cols[i];
         const d = i < len ? s.charCodeAt(len - 1 - i) - 48 : 0;
-        if (d !== c.d) { c.d = d; c.strip.style.transform = 'translateY(' + (-d * 10) + '%)'; }
         const off = i >= len && i > 0;
+        if (d !== c.d) { c.d = d; c.strip.style.transform = 'translateY(' + (-d * CELL_EM).toFixed(2) + 'em)'; }
         if (off !== c.off) { c.off = off; c.col.classList.toggle('off', off); }
+        const w = off ? '0em' : (DIGIT_ADV[d] + COL_PAD).toFixed(3) + 'em';
+        if (w !== c.w) { c.w = w; c.col.style.width = w; }
         const sp = this.seps[i];
         if (sp) { const so = len <= i; if (so !== sp.off) { sp.off = so; sp.el.classList.toggle('off', so); } }
       }
@@ -102,25 +108,31 @@
       if (r !== last) { last = r; water.style.transform = 'translateY(' + r + 'px)'; }
     };
   }
-  const COINS = 36, STACK_ORDER = [1, 0, 2];
-  function buildCoins(host) {
-    const wrap = document.createElement('div'); wrap.className = 'coins'; wrap.setAttribute('aria-hidden', 'true');
-    wrap.innerHTML = '<div class="coins-base"></div>';
-    const list = [];
-    for (let k = 0; k < COINS; k++) {
-      const c = document.createElement('i'); c.className = 'coin';
-      const s = STACK_ORDER[k % 3], l = Math.floor(k / 3);
-      c.style.setProperty('--s', s); c.style.setProperty('--l', l);
-      c.style.left = 'calc(' + s + ' * var(--sx))'; c.style.bottom = 'calc(' + l + ' * var(--ly))';
-      c.style.zIndex = String(100 + l);
-      wrap.appendChild(c); list.push(c);
+  /* stylised banknote stacks: two bundles of 14 notes, front bundle fills first */
+  const PER_STACK = 14, STACKS = 2, NOTES = PER_STACK * STACKS, NOTE_STEP = 4.5;
+  function buildMoney(host) {
+    const box = document.createElement('div'); box.className = 'money-box'; box.setAttribute('aria-hidden', 'true');
+    const wrap = document.createElement('div'); wrap.className = 'money'; box.appendChild(wrap);
+    const list = [], stacks = [];
+    for (let s = 0; s < STACKS; s++) {
+      const st = document.createElement('div'); st.className = 'stack stack-' + s;
+      st.innerHTML = '<div class="stack-shadow"></div>';
+      for (let l = 0; l < PER_STACK; l++) {
+        const b = document.createElement('div'); b.className = 'bill';
+        b.style.bottom = (l * NOTE_STEP) + 'px';
+        b.style.left = (((l * 37) % 5) - 2) + 'px'; /* slight deterministic jitter so edges read as separate notes */
+        b.innerHTML = '<div class="note"><i></i><b>تومان</b>' + (l === PER_STACK - 1 ? '<u></u>' : '') + '</div>';
+        st.appendChild(b); list.push(b);
+      }
+      wrap.appendChild(st); stacks.push(st);
     }
-    host.appendChild(wrap);
+    host.appendChild(box);
     let last = -1;
     return (f) => {
-      const n = f > 0 ? Math.max(1, Math.round(f * COINS)) : 0;
+      const n = f > 0 ? Math.max(1, Math.round(f * NOTES)) : 0;
       if (n === last) return; last = n;
-      list.forEach((c, i) => c.classList.toggle('on', i < n));
+      list.forEach((b, i) => b.classList.toggle('on', i < n));
+      stacks.forEach((st, s) => st.classList.toggle('has', n > s * PER_STACK));
     };
   }
   const PEOPLE = 10;
@@ -175,7 +187,7 @@
     root.querySelectorAll('[data-odo]').forEach((el) => { odos[el.dataset.odo] = new Odo(el, +el.dataset.digits || 6); });
     const vis = {
       tank: buildTank(root.querySelector('[data-vis="tank"]')),
-      coins: buildCoins(root.querySelector('[data-vis="coins"]')),
+      money: buildMoney(root.querySelector('[data-vis="money"]')),
       people: buildPeople(root.querySelector('[data-vis="people"]')),
     };
     const subs = {};
@@ -198,7 +210,7 @@
         if (progs[inp.key]) progs[inp.key].style.transform = 'scaleX(' + (disp[inp.key] / inp.max).toFixed(4) + ')';
       });
       const fr = cfg.fractions(disp);
-      vis.tank(visCurve(fr.water)); vis.coins(visCurve(fr.cost)); vis.people(visCurve(fr.hours));
+      vis.tank(visCurve(fr.water)); vis.money(visCurve(fr.cost)); vis.people(visCurve(fr.hours));
       const W = Math.round(out.water), C = Math.round(out.cost), H = Math.round(out.hours);
       subs.tubs.innerHTML = W > 0 ? '≈ <b>' + fa(W / 200) + '</b> وان حمام ۲۰۰ لیتری <span class="approx">(تقریبی)</span>' : '<span class="approx">معادل وان حمام ۲۰۰ لیتری (تقریبی)</span>';
       subs.read.textContent = C >= 1e6 ? '≈ ' + readableToman(C) : '';
