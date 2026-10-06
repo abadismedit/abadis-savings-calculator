@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>محاسبه‌گر صرفه‌جویی آبادیس — طرح رسید</title>
+  <meta name="description" content="محاسبه‌گر صرفه‌جویی آبادیس (طرح رسید): با اسکرول، صرفه‌جویی در مصرف آب، هزینه شست‌وشو و ضدعفونی و زمان کادر درمان را ببینید." />
+  <meta name="theme-color" content="#e8f3f3" />
+  <script>
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem('abadis-theme'); } catch (e) {}
+      if (t !== 'dark' && t !== 'light') t = (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <link rel="icon" type="image/png" sizes="32x32" href="../img/favicon-32.png" />
+  <link rel="preload" href="../fonts/KalamehWeb-FaNum-Black.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="../fonts/KalamehWeb-FaNum-Regular.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="../common/abadis-common.css" />
+  <style>
+
+    .rc-sec { background: var(--bg); }
+    #calc1 .calc-track { height: 430vh; }
+    #calc2 .calc-track { height: 680vh; }
+    #calc2 { background: radial-gradient(70% 40% at 20% 0%, rgba(46,196,198,.08), transparent 70%), var(--bg); }
+    .calc-pin { padding: 80px 24px 16px; }
+    .rc-stage { height: 100%; max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 460px); gap: 48px; align-items: start; }
+    .rc-side { align-self: center; display: flex; flex-direction: column; gap: 10px; }
+    .rc-kicker { font-size: .74rem; font-weight: 800; color: var(--teal); letter-spacing: .06em; }
+    [data-theme="dark"] .rc-kicker { color: #2ec4c6; }
+    .rc-side h2 { font-size: clamp(1.15rem, 2.6vw, 2rem); font-weight: 900; line-height: 1.35; }
+    .rc-hint { color: var(--muted); font-size: .9rem; }
+    .rc-side .chips { margin-top: 4px; }
+    .rc-machine { position: relative; display: flex; flex-direction: column; align-items: stretch; --paper: #fbfaf4; --pink: #1d2a29; --pmuted: #5f6d6b; --stamp: #05686b; }
+    [data-theme="dark"] .rc-machine { --paper: #ecebe2; --pink: #1a2524; --pmuted: #556260; --stamp: #05686b; }
+
+    /* printer */
+    .printer { position: relative; z-index: 2; height: 58px; border-radius: 16px 16px 10px 10px; background: linear-gradient(180deg, #f4f8f8, #d3dedf); border: 1px solid rgba(5,104,107,.15); box-shadow: 0 12px 30px rgba(11,46,50,.14), inset 0 1px 0 #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 16px 10px; }
+    [data-theme="dark"] .printer { background: linear-gradient(180deg, #1e3b3f, #0f2427); border-color: rgba(46,196,198,.18); box-shadow: 0 12px 30px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.07); }
+    .printer-brand { font-weight: 900; font-size: .9rem; color: var(--teal); }
+    [data-theme="dark"] .printer-brand { color: #2ec4c6; }
+    .printer-led { display: flex; align-items: center; gap: 6px; font-size: .68rem; font-weight: 700; color: var(--muted); }
+    .printer-led i { width: 8px; height: 8px; border-radius: 50%; background: #3ddc84; box-shadow: 0 0 8px #3ddc84; }
+    .printer.printing .printer-led i { animation: blink .18s steps(2) 3; }
+    @keyframes blink { 50% { opacity: .2; } }
+    .slot { position: absolute; left: 14px; right: 14px; bottom: 8px; height: 8px; border-radius: 4px; background: #0b1a1c; box-shadow: inset 0 2px 4px rgba(0,0,0,.8); }
+
+    /* paper */
+    .paper-mask { position: relative; z-index: 1; margin: -8px 26px 0; height: 0; overflow: hidden; transition: height .32s cubic-bezier(.3,.9,.4,1); filter: drop-shadow(0 10px 16px rgba(11,46,50,.16)); }
+    [data-theme="dark"] .paper-mask { filter: drop-shadow(0 10px 18px rgba(0,0,0,.5)); }
+    .paper { position: relative; padding: 14px 20px 4px; color: var(--pink); background-color: var(--paper);
+      background-image: repeating-linear-gradient(0deg, rgba(0,0,0,.022) 0 1px, transparent 1px 3px), radial-gradient(120% 60% at 50% 0%, rgba(0,0,0,.05), transparent 60%); }
+    .paper.thump { animation: thump .35s ease-out; }
+    @keyframes thump { 30% { transform: translateY(3px); } }
+    .rl { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 6px; padding: 3px 0; font-size: .98rem; font-weight: 700; opacity: 0; transform: translateY(-6px); transition: opacity .22s, transform .28s; }
+    .rl.on { opacity: 1; transform: none; }
+    .rl .k { white-space: nowrap; }
+    .rl .dots { flex: 1 1 24px; min-width: 24px; border-bottom: 2px dotted rgba(29,42,41,.35); transform: translateY(-5px); }
+    .rl .v { margin-inline-start: auto; font-weight: 900; }
+    .rl .v .odo { font-size: 1.14rem; }
+    .rl.sm { font-size: .8rem; font-weight: 600; color: var(--pmuted); padding-top: 0; }
+    .rl.sm .dots { border-bottom-width: 1px; }
+    .rl-head { display: block; text-align: center; padding-bottom: 6px; }
+    .rl-head b { display: block; font-size: 1.25rem; font-weight: 900; color: var(--stamp); letter-spacing: .02em; }
+    .rl-head span { display: block; font-size: .78rem; color: var(--pmuted); }
+    .rl-rule { display: block; height: 10px; padding: 0; border-bottom: 2px dashed rgba(29,42,41,.3); margin-bottom: 6px; }
+    .rl-rule.dbl { border-bottom: 4px double rgba(29,42,41,.45); }
+    .rl-total { padding: 6px 0 2px; }
+    .rl-total .k { flex: 1 0 100%; font-size: 1rem; font-weight: 900; }
+    .rl-total .dots { display: none; }
+    .rl-total .v { margin-inline-start: 0; margin-inline-end: auto; display: flex; align-items: baseline; gap: 6px; }
+    .rl-total .v .odo { font-size: 1.9rem; color: var(--stamp); }
+    .rl-stampzone { display: block; height: 70px; padding: 0; }
+    .rl-total small { font-size: .78rem; font-weight: 800; margin-inline-start: 4px; }
+    .rl-foot { display: block; text-align: center; padding: 6px 0 10px; }
+    .rl-foot p { font-size: .7rem; color: var(--pmuted); font-weight: 600; margin-bottom: 8px; }
+    .barcode { height: 26px; margin: 0 auto 10px; width: 70%; background: repeating-linear-gradient(90deg, var(--pink) 0 2px, transparent 2px 4px, var(--pink) 4px 5px, transparent 5px 8px, var(--pink) 8px 11px, transparent 11px 12px); opacity: .75; }
+    .rl-foot .hero-btn { padding: 9px 18px; font-size: .8rem; box-shadow: none; }
+    .tear { height: 10px; background: linear-gradient(135deg, var(--paper) 50%, transparent 50%) 0 0 / 12px 10px repeat-x, linear-gradient(225deg, var(--paper) 50%, transparent 50%) 0 0 / 12px 10px repeat-x; }
+    .stamp { position: absolute; left: 50%; margin-left: -96px; width: 192px; top: 0; z-index: 3; pointer-events: none; padding: 6px 14px; border: 3px double var(--stamp); border-radius: 10px; color: var(--stamp); font-weight: 900; font-size: 1.05rem; line-height: 1.3; text-align: center; transform: rotate(-11deg) scale(2.2); opacity: 0; mix-blend-mode: multiply;
+      background: radial-gradient(circle at 30% 40%, rgba(5,104,107,.06), transparent 60%); }
+    .stamp small { display: block; font-size: .62rem; font-weight: 800; letter-spacing: .2em; }
+    .stamp.on { animation: stampIn .42s cubic-bezier(.2,1.3,.4,1) forwards; }
+    @keyframes stampIn { 0% { opacity: 0; transform: rotate(-11deg) scale(2.2); } 60% { opacity: .92; transform: rotate(-11deg) scale(.94); } 100% { opacity: .88; transform: rotate(-11deg) scale(1); } }
+    .stamp.off { opacity: 0; transform: rotate(-11deg) scale(1.1); transition: opacity .25s, transform .25s; }
+
+    @media (max-width: 860px) {
+      .calc-pin { padding: 60px 12px 8px; }
+      .rc-stage { grid-template-columns: minmax(0, 1fr); gap: 14px; align-items: start; align-content: start; }
+      .rc-side { gap: 4px; }
+      .rc-kicker { display: none; }
+      .rc-side h2 { font-size: 1.05rem; }
+      .rc-hint { font-size: .72rem; }
+      .printer { height: 46px; padding: 0 12px 8px; border-radius: 13px 13px 8px 8px; }
+      .printer-brand { font-size: .8rem; }
+      .paper-mask { margin: -7px 12px 0; }
+      .paper { padding: 10px 13px 2px; }
+      .rl { font-size: .84rem; padding: 2px 0; }
+      .rl .v .odo { font-size: 1rem; }
+      .rl.sm { font-size: .7rem; }
+      .rl-head b { font-size: 1.05rem; }
+      .rl-head span { font-size: .68rem; }
+      .rl-total .k { font-size: .86rem; }
+      .rl-total .v .odo { font-size: 1.5rem; }
+      .rl-stampzone { height: 58px; }
+      .rl-foot p { font-size: .62rem; margin-bottom: 4px; }
+      .barcode { height: 18px; margin-bottom: 6px; }
+      .rl-foot .hero-btn { padding: 7px 14px; font-size: .74rem; }
+      .stamp { font-size: .9rem; padding: 4px 10px; width: 170px; margin-left: -85px; }
+    }
+    @media (prefers-reduced-motion: reduce) { .stamp.on { opacity: .88; transform: rotate(-11deg); } .rl, .paper-mask { transition: none; } }
+    @media (max-width: 860px) and (max-height: 760px) { .rl.sm, .barcode { display: none !important; } .rl-stampzone { height: 48px; } }
+
+  </style>
+</head>
+<body>
+
+  <header class="header" id="header">
+    <a class="logo" href="#top">آبادیس<span>مخازن طبی</span></a>
+    <nav class="nav">
+      <a href="#calc1">بر مبنای تعداد عمل جراحی</a>
+      <a href="#calc2">بر مبنای تعداد تخت</a>
+      <a href="#contact">ارتباط با ما</a>
+    </nav>
+    <div class="header-actions">
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="حالت شب" title="حالت شب" aria-pressed="false">
+        <svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z"/></svg>
+        <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>
+      </button>
+      <a class="header-cta" href="tel:02192001017">تماس با فروش</a>
+    </div>
+  </header>
+
+  <section class="intro" id="top">
+    <div class="eyebrow">ابزار محاسبه · طرح رسید</div>
+    <h1>رسید صرفه‌جویی <em>آبادیس</em></h1>
+    <p>اسکرول کنید تا رسید، خط به خط چاپ شود: صرفه‌جویی آب، هزینه شست‌وشو و ضدعفونی و زمان کادر درمان.</p>
+  </section>
+
+  <section class="calc rc-sec" id="calc1" aria-labelledby="calc1-t">
+    <div class="calc-track"><div class="calc-pin"><div class="rc-stage">
+      <div class="rc-side">
+        <div class="rc-kicker">رسید ۱</div>
+        <h2 id="calc1-t">بر مبنای تعداد عمل جراحی در سال</h2>
+        <p class="rc-hint" data-hint>اسکرول = چاپ رسید و افزایش تعداد عمل · به بالا = کاهش</p>
+        <div class="chips" role="group" aria-label="مقادیر آماده">
+              <button class="chip" type="button" data-n="1000">۱٬۰۰۰</button>
+              <button class="chip" type="button" data-n="5000">۵٬۰۰۰</button>
+              <button class="chip" type="button" data-n="10000">۱۰٬۰۰۰</button>
+              <button class="chip" type="button" data-n="15000">۱۵٬۰۰۰</button>
+              <button class="chip" type="button" data-n="30000">۳۰٬۰۰۰</button>
+            </div>
+        
+      </div>
+      <div class="rc-machine">
+          <div class="printer"><span class="printer-brand">آبادیس</span><span class="printer-led"><i></i>رسید صرفه‌جویی</span><span class="slot"></span></div>
+          <div class="paper-mask"><div class="paper">
+            <div class="rl rl-head" data-at="0.004"><b>آبادیس</b><span>رسید صرفه‌جویی · بر مبنای تعداد عمل جراحی در سال</span></div>
+            <div class="rl " data-at="0.012"><span class="k">تعداد عمل جراحی در سال</span><i class="dots"></i><span class="v"><span class="odo" data-odo="n" data-digits="5"></span></span></div>
+            <div class="rl rl-rule" data-at="0.02"></div>
+            <div class="rl " data-at="0.03"><span class="k">صرفه‌جویی آب (لیتر)</span><i class="dots"></i><span class="v"><span class="odo" data-odo="water" data-digits="7"></span></span></div>
+            <div class="rl sm" data-at="0.045"><span class="k">≈ وان حمام ۲۰۰ لیتری (تقریبی)</span><i class="dots"></i><span class="v" data-sub="tubs"></span></div>
+            <div class="rl " data-at="0.06"><span class="k">هزینه شست‌وشو و ضدعفونی (تومان)</span><i class="dots"></i><span class="v"><span class="odo" data-odo="cost" data-digits="13"></span></span></div>
+            <div class="rl sm" data-at="0.075"><span class="k">≈ به زبان ساده</span><i class="dots"></i><span class="v" data-sub="read"></span></div>
+            <div class="rl " data-at="0.09"><span class="k">زمان کادر درمان (ساعت)</span><i class="dots"></i><span class="v"><span class="odo" data-odo="hours" data-digits="6"></span></span></div>
+            <div class="rl sm" data-at="0.105"><span class="k">≈ شیفت کاری ۸ ساعته</span><i class="dots"></i><span class="v" data-sub="shifts"></span></div>
+            <div class="rl rl-rule dbl" data-at="0.12"></div>
+            <div class="rl rl-total" data-at="0.135" data-total><span class="k">جمع صرفه‌جویی هزینه</span><i class="dots"></i><span class="v"><span class="odo" data-odo="cost" data-digits="13"></span><small>تومان</small></span></div>
+            <div class="rl rl-stampzone" data-at="0.135" data-stampzone></div>
+            <div class="rl rl-foot" data-at="0.15"><p>* محاسبات بر اساس فرمول‌های محاسبه‌گر فعلی آبادیس</p><div class="barcode" aria-hidden="true"></div><a class="hero-btn" href="tel:02192001017">مشاوره با کارشناس فروش</a></div>
+            <div class="tear"></div>
+            <div class="stamp" aria-hidden="true"><small>★ ★ ★</small>صرفه‌جویی با آبادیس</div>
+          </div></div>
+        </div>
+    </div></div></div>
+  </section>
+
+  <section class="calc rc-sec" id="calc2" aria-labelledby="calc2-t">
+    <div class="calc-track"><div class="calc-pin"><div class="rc-stage">
+      <div class="rc-side">
+        <div class="rc-kicker">رسید ۲</div>
+        <h2 id="calc2-t">بر مبنای تعداد تخت</h2>
+        <p class="rc-hint" data-hint>مرحله ۱: با اسکرول، تعداد تخت اتاق عمل را تنظیم کنید</p>
+        <div class="chips" role="group" aria-label="ترکیب‌های آماده (تخت اتاق عمل + ICU|CCU)">
+              <button class="chip" type="button" data-a="10" data-b="10">۱۰ + ۱۰</button>
+              <button class="chip" type="button" data-a="20" data-b="10">۲۰ + ۱۰</button>
+              <button class="chip" type="button" data-a="50" data-b="20">۵۰ + ۲۰</button>
+              <button class="chip" type="button" data-a="100" data-b="50">۱۰۰ + ۵۰</button>
+              <button class="chip" type="button" data-a="300" data-b="100">۳۰۰ + ۱۰۰</button>
+              <button class="chip" type="button" data-a="700" data-b="700">۷۰۰ + ۷۰۰</button>
+            </div>
+        <button class="confirm" type="button" data-confirm hidden></button>
+      </div>
+      <div class="rc-machine">
+          <div class="printer"><span class="printer-brand">آبادیس</span><span class="printer-led"><i></i>رسید صرفه‌جویی</span><span class="slot"></span></div>
+          <div class="paper-mask"><div class="paper">
+            <div class="rl rl-head" data-at="0.004"><b>آبادیس</b><span>رسید صرفه‌جویی · بر مبنای تعداد تخت</span></div>
+            <div class="rl " data-at="0.01"><span class="k">تعداد تخت اتاق عمل</span><i class="dots"></i><span class="v"><span class="odo" data-odo="a" data-digits="3"></span></span></div><div class="rl " data-at="0.016"><span class="k">تعداد تخت ICU|CCU</span><i class="dots"></i><span class="v"><span class="odo" data-odo="b" data-digits="3"></span></span></div>
+            <div class="rl rl-rule" data-at="0.022"></div>
+            <div class="rl " data-at="0.03"><span class="k">صرفه‌جویی آب (لیتر)</span><i class="dots"></i><span class="v"><span class="odo" data-odo="water" data-digits="7"></span></span></div>
+            <div class="rl sm" data-at="0.04"><span class="k">≈ وان حمام ۲۰۰ لیتری (تقریبی)</span><i class="dots"></i><span class="v" data-sub="tubs"></span></div>
+            <div class="rl " data-at="0.05"><span class="k">هزینه شست‌وشو و ضدعفونی (تومان)</span><i class="dots"></i><span class="v"><span class="odo" data-odo="cost" data-digits="11"></span></span></div>
+            <div class="rl sm" data-at="0.06"><span class="k">≈ به زبان ساده</span><i class="dots"></i><span class="v" data-sub="read"></span></div>
+            <div class="rl " data-at="0.07"><span class="k">زمان کادر درمان (ساعت)</span><i class="dots"></i><span class="v"><span class="odo" data-odo="hours" data-digits="6"></span></span></div>
+            <div class="rl sm" data-at="0.08"><span class="k">≈ شیفت کاری ۸ ساعته</span><i class="dots"></i><span class="v" data-sub="shifts"></span></div>
+            <div class="rl rl-rule dbl" data-at="0.09"></div>
+            <div class="rl rl-total" data-at="0.1" data-total><span class="k">جمع صرفه‌جویی هزینه</span><i class="dots"></i><span class="v"><span class="odo" data-odo="cost" data-digits="11"></span><small>تومان</small></span></div>
+            <div class="rl rl-stampzone" data-at="0.1" data-stampzone></div>
+            <div class="rl rl-foot" data-at="0.11"><p>* محاسبات بر اساس فرمول‌های محاسبه‌گر فعلی آبادیس</p><div class="barcode" aria-hidden="true"></div><a class="hero-btn" href="tel:02192001017">مشاوره با کارشناس فروش</a></div>
+            <div class="tear"></div>
+            <div class="stamp" aria-hidden="true"><small>★ ★ ★</small>صرفه‌جویی با آبادیس</div>
+          </div></div>
+        </div>
+    </div></div></div>
+  </section>
+
+  <p class="foot-note"><b>*</b> محاسبات بر اساس فرمول‌های محاسبه‌گر فعلی آبادیس</p>
+
+  <section class="cta-band">
+    <h2>برای محاسبه دقیق مرکز درمانی خود با ما صحبت کنید</h2>
+    <p>کارشناسان فروش مخازن طبی آبادیس آماده پاسخ‌گویی به پرسش‌های شما هستند.</p>
+    <a class="hero-btn" href="tel:02192001017">مشاوره با کارشناس فروش</a>
+    <p class="cta-sub">مرکز تماس: <a href="tel:02192001017" dir="ltr">021-92001017</a> · <a href="https://abadis-med.com/ارتباط-با-ما/" target="_blank" rel="noopener">صفحه ارتباط با ما</a></p>
+  </section>
+
+  <footer class="site-footer" id="contact">
+    <div class="foot-inner">
+      <div class="foot-brand">
+        <strong>مخازن طبی آبادیس</strong>
+        <span>با ما در ارتباط باشید...</span>
+        <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;align-items:flex-start">
+          <a href="https://abadis-med.com/ارتباط-با-ما/" target="_blank" rel="noopener">صفحه ارتباط با ما</a>
+          <a href="https://abadis-med.com/" target="_blank" rel="noopener">abadis-med.com</a>
+        </div>
+      </div>
+      <div>
+        <h3>تماس</h3>
+        <dl>
+          <dt>مرکز تماس:</dt><dd><a href="tel:+982192001017" dir="ltr">02192001017</a></dd>
+          <dt>تلفن تماس:</dt><dd><a href="tel:+982122671845" dir="ltr">02122671845</a> | <a href="tel:+982122205502" dir="ltr">02122205502</a><br><a href="tel:+982122215503" dir="ltr">02122215503</a> | <a href="tel:+982122218910" dir="ltr">02122218910</a></dd>
+          <dt>فکس:</dt><dd><span dir="ltr">02141425555</span> | داخلی 28544</dd>
+          <dt>پست الکترونیک:</dt><dd><a href="mailto:info@abadis-med.com">info@abadis-med.com</a></dd>
+          <dt>واتس‌اپ:</dt><dd><a href="https://wa.me/989100145809" target="_blank" rel="noopener" dir="ltr">+989100145809</a></dd>
+        </dl>
+      </div>
+      <div>
+        <h3>نشانی</h3>
+        <p><b>نشانی دفتر مرکزی:</b><br>ایران، تهران، قیطریه، خیابان اندرزگو، پلاک 104، واحد2</p>
+        <p><b>نشانی کارخانه:</b><br>ایران،تهران،شهرک صنعتی شمس آباد، بلوار گلستان، کوچه گلشن ۱۹،پلاک۱۷</p>
+      </div>
+    </div>
+    <div class="foot-copy">مخازن طبی آبادیس · محاسبه‌گر صرفه‌جویی · طرح رسید</div>
+  </footer>
+
+  <script src="../common/abadis-common.js"></script>
+  <script>
+
+    (() => {
+      const A = Abadis, fa = A.fa;
+      function setup(root, kind) {
+        const mask = root.querySelector('.paper-mask'), paper = root.querySelector('.paper');
+        const lines = [...root.querySelectorAll('.rl')], tear = root.querySelector('.tear');
+        const stamp = root.querySelector('.stamp'), total = root.querySelector('[data-total]'), zone = root.querySelector('[data-stampzone]'), printer = root.querySelector('.printer');
+        const sub = {}; root.querySelectorAll('[data-sub]').forEach((e) => { sub[e.dataset.sub] = e; });
+        const hint = root.querySelector('[data-hint]');
+        let printed = -1, stamped = false, pt = 0;
+        function layout() {
+          let h = parseFloat(getComputedStyle(paper).paddingTop) || 0, count = 0;
+          lines.forEach((l) => { if (l.classList.contains('on')) { h += l.offsetHeight; count++; } });
+          if (count) h += parseFloat(getComputedStyle(paper).paddingBottom) + tear.offsetHeight;
+          mask.style.height = Math.round(h) + 'px';
+          stamp.style.top = (zone.offsetTop + 4) + 'px';
+          return count;
+        }
+        const api = A.createCalc(root, kind, (s) => {
+          lines.forEach((l) => l.classList.toggle('on', s.p >= +l.dataset.at));
+          const count = layout();
+          if (count !== printed) {
+            if (count > printed && printed >= 0 && !A.reduced) { printer.classList.remove('printing'); void printer.offsetWidth; printer.classList.add('printing'); clearTimeout(pt); pt = setTimeout(() => printer.classList.remove('printing'), 600); }
+            printed = count;
+          }
+          sub.tubs.textContent = fa(s.W / 200);
+          sub.read.textContent = s.C >= 1e6 ? A.readableToman(s.C) : fa(s.C) + ' تومان';
+          sub.shifts.textContent = fa(s.H / 8);
+          const want = s.settled && total.classList.contains('on') && s.W > 0;
+          if (want !== stamped) {
+            stamped = want;
+            stamp.classList.toggle('on', want); stamp.classList.toggle('off', !want);
+            if (want && !A.reduced) { paper.classList.remove('thump'); void paper.offsetWidth; paper.classList.add('thump'); }
+          }
+          if (kind === 'beds') hint.textContent = s.phase === 'a'
+            ? (s.lockedA != null ? 'تخت اتاق عمل روی ' + fa(s.lockedA) + ' ثابت است' : 'مرحله ۱: با اسکرول، تعداد تخت اتاق عمل را تنظیم کنید')
+            : 'مرحله ۲: با اسکرول، تعداد تخت ICU|CCU را تنظیم کنید';
+        });
+        window.addEventListener('resize', () => layout());
+        document.fonts && document.fonts.ready.then(() => layout());
+        return api;
+      }
+      setup(document.getElementById('calc1'), 'surgery');
+      setup(document.getElementById('calc2'), 'beds');
+      A.start();
+    })();
+
+  </script>
+</body>
+</html>

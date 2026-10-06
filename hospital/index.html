@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>محاسبه‌گر صرفه‌جویی آبادیس — طرح بیمارستان</title>
+  <meta name="description" content="محاسبه‌گر صرفه‌جویی آبادیس (طرح بیمارستان): با اسکرول، صرفه‌جویی در مصرف آب، هزینه شست‌وشو و ضدعفونی و زمان کادر درمان را ببینید." />
+  <meta name="theme-color" content="#e8f3f3" />
+  <script>
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem('abadis-theme'); } catch (e) {}
+      if (t !== 'dark' && t !== 'light') t = (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <link rel="icon" type="image/png" sizes="32x32" href="../img/favicon-32.png" />
+  <link rel="preload" href="../fonts/KalamehWeb-FaNum-Black.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="../fonts/KalamehWeb-FaNum-Regular.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="../common/abadis-common.css" />
+  <style>
+
+    .hs-sec { background: var(--bg); }
+    #calc1 .calc-track { height: 440vh; }
+    #calc2 .calc-track { height: 700vh; }
+    .calc-pin { padding: 76px 24px 14px; }
+    .hs { height: 100%; max-width: 1140px; margin: 0 auto; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; gap: 10px; }
+    .hs-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 8px 20px; flex-wrap: wrap; }
+    .hs-head h2 { font-size: clamp(1.1rem, 2.3vw, 1.65rem); font-weight: 900; line-height: 1.35; }
+    .hs-hint { color: var(--muted); font-size: .82rem; }
+    .hs-ctl { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+    .hs-in { display: inline-flex; align-items: baseline; gap: 8px; font-weight: 800; color: var(--muted); font-size: .8rem; }
+    .hs-in .odo { font-size: 1.9rem; color: var(--teal); }
+    [data-theme="dark"] .hs-in .odo { color: #2ec4c6; }
+
+    /* scene */
+    .scene { --tw: 190px; position: relative; min-height: 0; border-radius: 22px; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end;
+      background: linear-gradient(180deg, #e3f3f3 0%, #f3fafa 62%, #eef5f2 100%); border: 1px solid var(--card-b); box-shadow: var(--shadow); padding: 14px 26px 0; }
+    [data-theme="dark"] .scene { background: radial-gradient(1.2px 1.2px at 12% 18%, #cfe 50%, transparent 51%), radial-gradient(1px 1px at 34% 9%, #cfe 50%, transparent 51%), radial-gradient(1.4px 1.4px at 71% 14%, #cfe 50%, transparent 51%), radial-gradient(1px 1px at 88% 30%, #cfe 50%, transparent 51%), radial-gradient(1px 1px at 52% 24%, #cfe 50%, transparent 51%), linear-gradient(180deg, #04161a 0%, #0a2a2e 70%, #0b2a2b 100%); }
+    .row { position: relative; z-index: 1; display: flex; align-items: flex-end; min-height: 0; }
+    .ground { position: relative; z-index: 0; height: 16px; margin: 0 -26px; background: linear-gradient(180deg, #b9d3cf, #9fc2bc); }
+    [data-theme="dark"] .ground { background: linear-gradient(180deg, #123a3b, #0b2b2c); }
+
+    /* building */
+    .bwrap { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; align-items: stretch; }
+    .board { position: relative; margin: 0 6% 10px; background: #061719; border-radius: 12px; padding: 7px 14px; color: #d9f2f2; box-shadow: 0 10px 24px rgba(11,46,50,.25), inset 0 0 0 1px rgba(46,196,198,.25);
+      background-image: radial-gradient(rgba(46,196,198,.10) 1px, transparent 1.2px); background-size: 5px 5px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 18px; }
+    .board::before, .board::after { content: ""; position: absolute; bottom: -10px; width: 6px; height: 10px; background: #5d7b7e; }
+    .board::before { right: 22%; } .board::after { left: 22%; }
+    .brd { min-width: 0; }
+    .brd .lbl { font-size: .72rem; font-weight: 700; color: rgba(217,242,242,.72); }
+    .brd .val { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+    .brd .odo { font-size: clamp(1.15rem, 2vw, 1.7rem); }
+    .brd-c .odo { color: #8fe27c; text-shadow: 0 0 10px rgba(143,226,124,.45); }
+    .brd-h .odo { color: #ffc861; text-shadow: 0 0 10px rgba(255,200,97,.45); }
+    .brd small { font-size: .72rem; font-weight: 700; color: rgba(217,242,242,.75); }
+    .brd .sub { font-size: .7rem; color: rgba(217,242,242,.75); min-height: 1.2em; }
+    .brd .sub b { color: #fff; }
+    .bldg { position: relative; border-radius: 12px 12px 0 0; padding: 0 12px; background: #ffffff; border: 2px solid rgba(5,104,107,.28); border-bottom: 0; box-shadow: 0 -2px 30px rgba(11,46,50,.08); }
+    [data-theme="dark"] .bldg { background: #0f3135; border-color: rgba(46,196,198,.3); }
+    .sign { position: absolute; top: -13px; right: 50%; transform: translateX(50%); display: inline-flex; gap: 6px; align-items: center; background: var(--teal); color: #fff; font-weight: 900; font-size: .78rem; padding: 2px 14px; border-radius: 999px; white-space: nowrap; }
+    [data-theme="dark"] .sign { background: #2ec4c6; color: #072326; }
+    .sign svg { width: 12px; height: 12px; }
+    .floor { position: relative; padding: 18px 10px 10px; border-bottom: 6px solid rgba(5,104,107,.22); --glow: 0;
+      background: linear-gradient(180deg, rgba(46,196,198, calc(.04 + var(--glow) * .16)), rgba(46,196,198, calc(var(--glow) * .07))), repeating-linear-gradient(90deg, transparent 0 46px, rgba(5,104,107,.04) 46px 48px); transition: outline-color .3s; outline: 2px solid transparent; outline-offset: -2px; }
+    [data-theme="dark"] .floor { border-bottom-color: rgba(46,196,198,.22); background: linear-gradient(180deg, rgba(46,196,198, calc(.03 + var(--glow) * .2)), rgba(46,196,198, calc(var(--glow) * .08))), repeating-linear-gradient(90deg, transparent 0 46px, rgba(255,255,255,.025) 46px 48px); }
+    .floor:first-of-type { padding-top: 22px; }
+    .floor.active { outline-color: var(--accent); }
+    .fl-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 6px; }
+    .fl-name { font-size: .82rem; font-weight: 900; display: inline-flex; align-items: baseline; gap: 8px; }
+    .fl-name .odo { font-size: 1.25rem; color: var(--teal); }
+    [data-theme="dark"] .fl-name .odo { color: #2ec4c6; }
+    .fl-name .hold { font-size: .62rem; font-weight: 800; background: var(--accent); color: #072326; border-radius: 999px; padding: 0 7px; opacity: 0; transition: opacity .3s; }
+    .floor.held .hold { opacity: 1; }
+    .fl-key { font-size: .7rem; color: var(--muted); font-weight: 700; white-space: nowrap; }
+    .icons { display: grid; grid-template-columns: repeat(var(--cols, 18), minmax(0, 1fr)); gap: 4px; }
+    .ic { position: relative; aspect-ratio: 1; max-height: 44px; }
+    .ic svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .ic .b { color: rgba(5,104,107,.22); }
+    [data-theme="dark"] .ic .b { color: rgba(168,213,214,.2); }
+    .ic .l { color: var(--teal); opacity: 0; transition: opacity .3s; }
+    [data-theme="dark"] .ic .l { color: #2ec4c6; filter: drop-shadow(0 0 3px rgba(46,196,198,.6)); }
+    .ecg { display: block; width: 100%; height: 34px; margin-top: 8px; opacity: .15; transition: opacity .4s; }
+    .ecg path { fill: none; stroke: var(--teal); stroke-width: 2; stroke-linejoin: round; stroke-dasharray: 60 340; animation: ecg 2.4s linear infinite; }
+    [data-theme="dark"] .ecg path { stroke: #2ec4c6; }
+    @keyframes ecg { from { stroke-dashoffset: 400; } to { stroke-dashoffset: 0; } }
+    .lobby { height: 44px; display: flex; justify-content: center; align-items: flex-end; gap: 4px; }
+    .lobby i { width: 26px; height: 34px; border-radius: 6px 6px 0 0; background: linear-gradient(180deg, rgba(46,196,198,.35), rgba(5,104,107,.25)); border: 2px solid rgba(5,104,107,.3); border-bottom: 0; }
+
+    /* pipe + tank */
+    .pipe { flex: 0 0 7%; min-width: 26px; height: 14px; margin-bottom: calc(var(--tw) * .367 - 7px); position: relative; border-radius: 3px; background: linear-gradient(180deg, #c3d4d6, #8ea9ac 55%, #b6c9cb); box-shadow: inset 0 -1px 0 rgba(0,0,0,.15); }
+    [data-theme="dark"] .pipe { background: linear-gradient(180deg, #4a6a6e, #2a4447 55%, #3b585c); }
+    .pipe .flow { position: absolute; inset: 4px 2px; border-radius: 3px; opacity: 0; transition: opacity .4s;
+      background: repeating-linear-gradient(90deg, #62d9ff 0 10px, rgba(98,217,255,.25) 10px 18px); background-size: 18px 100%; animation: flow .6s linear infinite; }
+    @keyframes flow { to { background-position: -18px 0; } }
+    .pipe::before { content: ""; position: absolute; top: -9px; left: 50%; width: 16px; height: 6px; margin-left: -8px; border-radius: 3px; background: #05686b; }
+    .tankcol { flex: 0 0 var(--tw); width: var(--tw); display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .tank-read { text-align: center; line-height: 1.3; }
+    .tank-read .odo { font-size: 1.35rem; color: #0a7fa8; }
+    [data-theme="dark"] .tank-read .odo { color: #62d9ff; }
+    .tank-read small { display: block; font-size: .72rem; font-weight: 800; color: var(--muted); }
+    .tank-read .sub { display: block; font-size: .68rem; color: var(--muted); min-height: 1.2em; }
+    .tank-read .sub b { color: var(--ink); }
+    .tank { width: 100%; height: auto; display: block; overflow: visible; }
+    .t-glass { fill: rgba(255,255,255,.55); stroke: rgba(5,104,107,.45); stroke-width: 2.5; }
+    [data-theme="dark"] .t-glass { fill: rgba(255,255,255,.04); stroke: rgba(98,217,255,.45); }
+    .t-leg { fill: #8ea9ac; } [data-theme="dark"] .t-leg { fill: #3b585c; }
+    .t-tick { stroke: rgba(5,104,107,.35); stroke-width: 1.5; } [data-theme="dark"] .t-tick { stroke: rgba(168,213,214,.3); }
+    .t-wave { animation: wave 3.2s linear infinite; }
+    @keyframes wave { to { transform: translateX(-60px); } }
+    .t-shine { fill: rgba(255,255,255,.35); }
+
+    .hs-sum { display: flex; align-items: center; justify-content: space-between; gap: 14px; background: var(--card); border: 1px solid var(--card-b); border-radius: 16px; padding: 10px 16px; box-shadow: var(--shadow); }
+    .sum-text { font-size: .86rem; line-height: 1.7; }
+    .sum-text b { color: var(--teal); font-weight: 900; }
+    [data-theme="dark"] .sum-text b { color: #2ec4c6; }
+    .sum-note { display: block; font-size: .7rem; color: var(--muted); }
+    .hs-sum .hero-btn { padding: 10px 20px; font-size: .84rem; }
+
+    @media (max-width: 860px) {
+      .calc-pin { padding: 58px 10px 8px; }
+      .hs { gap: 6px; }
+      .hs-head { flex-direction: column; align-items: stretch; gap: 2px; }
+      .hs-head h2 { font-size: 1.02rem; }
+      .hs-hint { font-size: .7rem; }
+      .hs-ctl { align-items: stretch; gap: 4px; }
+      .hs-in .odo { font-size: 1.4rem; }
+      .scene { --tw: 84px; padding: 8px 8px 0; border-radius: 16px; }
+      .ground { margin: 0 -8px; height: 10px; }
+      .board { margin: 0 0 9px; grid-template-columns: 1fr; padding: 5px 10px; gap: 2px; }
+      .brd .odo { font-size: 1.12rem; }
+      .brd .lbl, .brd small { font-size: .64rem; }
+      .brd .sub { font-size: .62rem; }
+      .brd .val { gap: 4px; }
+      .bldg { padding: 0 6px; }
+      .floor { padding: 16px 4px 6px; border-bottom-width: 4px; }
+      .floor:first-of-type { padding-top: 18px; }
+      .fl-top { flex-direction: column; gap: 0; margin-bottom: 4px; }
+      .fl-name { font-size: .72rem; }
+      .fl-name .odo { font-size: 1.05rem; }
+      .fl-key { font-size: .6rem; }
+      .icons { --cols: 9 !important; gap: 2px; }
+      #calc1 .icons { --cols: 10 !important; }
+      .ic { max-height: 25px; }
+      .lobby { height: 26px; } .lobby i { width: 16px; height: 20px; }
+      .ecg { height: 22px; margin-top: 4px; }
+      .pipe { flex-basis: 6%; min-width: 12px; height: 10px; margin-bottom: calc(var(--tw) * .367 - 5px); }
+      .pipe::before { width: 10px; margin-left: -5px; top: -7px; height: 5px; }
+      .tank-read .odo { font-size: .95rem; }
+      .tank-read small { font-size: .62rem; }
+      .tank-read .sub { font-size: .58rem; }
+      .hs-sum { padding: 6px 10px; gap: 8px; border-radius: 12px; }
+      .sum-text { font-size: .68rem; line-height: 1.55; }
+      .sum-note { display: none; }
+      .hs-sum .hero-btn { padding: 8px 11px; font-size: .72rem; }
+    }
+    @media (max-width: 860px) and (max-height: 760px) { .ic { max-height: 20px; } .brd .sub { display: none; } }
+    @media (min-width: 861px) and (max-height: 820px) { .ic { max-height: 30px; } .scene { --tw: 150px; } .lobby { height: 30px; } }
+
+  </style>
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+    <symbol id="i-bed" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6v13M3 15h18v4M21 15v-2.5A2.5 2.5 0 0 0 18.5 10H11v5"/><circle cx="7" cy="11.5" r="1.9"/></g></symbol>
+    <symbol id="i-lamp" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5v3.5"/><path d="M4.5 12a7.5 5.5 0 0 1 15 0z" fill="currentColor" fill-opacity=".25"/><path d="M8 15.5l-1.2 3M12 15.5v3.5M16 15.5l1.2 3"/></g></symbol>
+  </defs></svg>
+  <header class="header" id="header">
+    <a class="logo" href="#top">آبادیس<span>مخازن طبی</span></a>
+    <nav class="nav">
+      <a href="#calc1">بر مبنای تعداد عمل جراحی</a>
+      <a href="#calc2">بر مبنای تعداد تخت</a>
+      <a href="#contact">ارتباط با ما</a>
+    </nav>
+    <div class="header-actions">
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="حالت شب" title="حالت شب" aria-pressed="false">
+        <svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z"/></svg>
+        <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>
+      </button>
+      <a class="header-cta" href="tel:02192001017">تماس با فروش</a>
+    </div>
+  </header>
+
+  <section class="intro" id="top">
+    <div class="eyebrow">ابزار محاسبه · طرح بیمارستان</div>
+    <h1>بیمارستانی که <em>صرفه‌جویی</em> می‌کند</h1>
+    <p>اسکرول کنید تا بیمارستان روشن شود؛ لوله‌ها آب صرفه‌جویی‌شده را به مخزن بیرون می‌برند و نمایشگر پشت‌بام، هزینه و زمان را نشان می‌دهد.</p>
+  </section>
+
+  <section class="calc hs-sec" id="calc1" aria-labelledby="calc1-t">
+    <div class="calc-track"><div class="calc-pin"><div class="hs">
+      <div class="hs-head">
+        <div><h2 id="calc1-t">بر مبنای تعداد عمل جراحی در سال</h2><p class="hs-hint" data-hint>با اسکرول، اتاق‌های عمل روشن می‌شوند و مخزن پر می‌شود</p></div>
+        <div class="hs-ctl"><span class="hs-in">تعداد عمل در سال <span class="odo" data-odo="n" data-digits="5"></span></span><div class="chips" role="group" aria-label="مقادیر آماده">
+              <button class="chip" type="button" data-n="1000">۱٬۰۰۰</button>
+              <button class="chip" type="button" data-n="5000">۵٬۰۰۰</button>
+              <button class="chip" type="button" data-n="10000">۱۰٬۰۰۰</button>
+              <button class="chip" type="button" data-n="15000">۱۵٬۰۰۰</button>
+              <button class="chip" type="button" data-n="30000">۳۰٬۰۰۰</button>
+            </div></div>
+      </div>
+      <div class="scene">
+          <div class="row">
+            <div class="bwrap">
+              <div class="board" aria-label="نمایشگر پشت‌بام">
+                <div class="brd brd-c"><div class="lbl">هزینه شست‌وشو و ضدعفونی</div><div class="val"><span class="odo" data-odo="cost" data-digits="13"></span><small>تومان</small></div><div class="sub" data-sub="read"></div></div>
+                <div class="brd brd-h"><div class="lbl">زمان کادر درمان</div><div class="val"><span class="odo" data-odo="hours" data-digits="6"></span><small>ساعت</small></div><div class="sub" data-sub="shifts"></div></div>
+              </div>
+              <div class="bldg"><span class="sign"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 1h3v3.5H11v3H7.5V11h-3V7.5H1v-3h3.5z" fill="currentColor"/></svg>بیمارستان</span>
+                <div class="floor" data-floor="n"><div class="fl-top"><span class="fl-name">اتاق‌های عمل</span><span class="fl-key">هر چراغ = ۱٬۰۰۰ عمل جراحی در سال</span></div>
+              <div class="icons" data-icons="n" style="--cols:10"><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-lamp"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-lamp"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-lamp"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-lamp"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-lamp"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-lamp"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-lamp"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-lamp"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-lamp"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-lamp"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-lamp"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-lamp"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-lamp"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-lamp"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-lamp"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-lamp"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-lamp"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-lamp"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-lamp"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-lamp"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-lamp"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-lamp"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-lamp"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-lamp"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-lamp"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-lamp"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-lamp"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-lamp"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-lamp"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-lamp"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-lamp"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-lamp"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-lamp"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-lamp"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-lamp"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-lamp"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-lamp"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-lamp"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-lamp"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-lamp"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-lamp"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-lamp"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-lamp"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-lamp"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-lamp"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-lamp"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-lamp"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-lamp"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-lamp"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-lamp"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-lamp"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-lamp"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-lamp"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-lamp"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-lamp"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-lamp"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-lamp"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-lamp"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-lamp"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-lamp"/></svg></i></div>
+              <svg class="ecg" viewBox="0 0 400 34" preserveAspectRatio="none" aria-hidden="true"><path pathLength="400" d="M0 20 H60 L70 20 L78 6 L86 30 L94 14 L100 20 H180 L190 20 L198 6 L206 30 L214 14 L220 20 H300 L310 20 L318 6 L326 30 L334 14 L340 20 H400"/></svg>
+            </div>
+                <div class="lobby" aria-hidden="true"><i></i><i></i></div>
+              </div>
+            </div>
+            <div class="pipe" aria-hidden="true"><span class="flow"></span></div>
+            <div class="tankcol">
+              <div class="tank-read"><span class="odo" data-odo="water" data-digits="7"></span><small>لیتر آب</small><span class="sub" data-sub="tubs"></span></div>
+              <svg class="tank" viewBox="0 0 120 240" aria-hidden="true">
+                <defs><clipPath id="tclip-n"><rect x="14" y="14" width="92" height="196" rx="18"/></clipPath>
+                  <linearGradient id="tw-n" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#62d9ff"/><stop offset="1" stop-color="#0a7fa8"/></linearGradient></defs>
+                <rect class="t-leg" x="24" y="206" width="10" height="34" rx="2"/><rect class="t-leg" x="86" y="206" width="10" height="34" rx="2"/>
+                <rect class="t-leg" x="104" y="189" width="16" height="14" rx="2"/>
+                <g clip-path="url(#tclip-n)"><g class="t-water" transform="translate(0 210)"><g class="t-wave"><path d="M0 6 Q15 0 30 6 T60 6 T90 6 T120 6 T150 6 T180 6 V260 H0z" fill="url(#tw-n)" opacity=".92"/></g></g></g>
+                <rect class="t-glass" x="14" y="14" width="92" height="196" rx="18"/>
+                <rect class="t-shine" x="24" y="30" width="7" height="150" rx="3.5"/>
+                <g class="t-ticks"><line class="t-tick" x1="92" y1="60" x2="104" y2="60"/><line class="t-tick" x1="96" y1="85" x2="104" y2="85"/><line class="t-tick" x1="92" y1="110" x2="104" y2="110"/><line class="t-tick" x1="96" y1="135" x2="104" y2="135"/><line class="t-tick" x1="92" y1="160" x2="104" y2="160"/></g>
+              </svg>
+            </div>
+          </div>
+          <div class="ground"></div>
+        </div>
+      <div class="hs-sum"><p class="sum-text" data-sum></p><a class="hero-btn" href="tel:02192001017">مشاوره با کارشناس فروش</a></div>
+    </div></div></div>
+  </section>
+
+  <section class="calc hs-sec" id="calc2" aria-labelledby="calc2-t">
+    <div class="calc-track"><div class="calc-pin"><div class="hs">
+      <div class="hs-head">
+        <div><h2 id="calc2-t">بر مبنای تعداد تخت</h2><p class="hs-hint" data-hint>مرحله ۱: با اسکرول، تخت‌های اتاق عمل روشن می‌شوند</p></div>
+        <div class="hs-ctl"><div class="chips" role="group" aria-label="ترکیب‌های آماده (تخت اتاق عمل + ICU|CCU)">
+              <button class="chip" type="button" data-a="10" data-b="10">۱۰ + ۱۰</button>
+              <button class="chip" type="button" data-a="20" data-b="10">۲۰ + ۱۰</button>
+              <button class="chip" type="button" data-a="50" data-b="20">۵۰ + ۲۰</button>
+              <button class="chip" type="button" data-a="100" data-b="50">۱۰۰ + ۵۰</button>
+              <button class="chip" type="button" data-a="300" data-b="100">۳۰۰ + ۱۰۰</button>
+              <button class="chip" type="button" data-a="700" data-b="700">۷۰۰ + ۷۰۰</button>
+            </div><button class="confirm" type="button" data-confirm hidden></button></div>
+      </div>
+      <div class="scene">
+          <div class="row">
+            <div class="bwrap">
+              <div class="board" aria-label="نمایشگر پشت‌بام">
+                <div class="brd brd-c"><div class="lbl">هزینه شست‌وشو و ضدعفونی</div><div class="val"><span class="odo" data-odo="cost" data-digits="11"></span><small>تومان</small></div><div class="sub" data-sub="read"></div></div>
+                <div class="brd brd-h"><div class="lbl">زمان کادر درمان</div><div class="val"><span class="odo" data-odo="hours" data-digits="6"></span><small>ساعت</small></div><div class="sub" data-sub="shifts"></div></div>
+              </div>
+              <div class="bldg"><span class="sign"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 1h3v3.5H11v3H7.5V11h-3V7.5H1v-3h3.5z" fill="currentColor"/></svg>بیمارستان</span>
+                <div class="floor" data-floor="a"><div class="fl-top"><span class="fl-name">طبقه اتاق عمل <span class="odo" data-odo="a" data-digits="3"></span> تخت <span class="hold">ثابت</span></span><span class="fl-key">هر آیکون = ۲۰ تخت</span></div><div class="icons" data-icons="a" style="--cols:12"><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i></div></div>
+            <div class="floor" data-floor="b"><div class="fl-top"><span class="fl-name">طبقه ICU|CCU <span class="odo" data-odo="b" data-digits="3"></span> تخت</span><span class="fl-key">هر آیکون = ۲۰ تخت</span></div><div class="icons" data-icons="b" style="--cols:12"><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i><i class="ic"><svg viewBox="0 0 24 24" class="b" aria-hidden="true"><use href="#i-bed"/></svg><svg viewBox="0 0 24 24" class="l" aria-hidden="true"><use href="#i-bed"/></svg></i></div></div>
+                <div class="lobby" aria-hidden="true"><i></i><i></i></div>
+              </div>
+            </div>
+            <div class="pipe" aria-hidden="true"><span class="flow"></span></div>
+            <div class="tankcol">
+              <div class="tank-read"><span class="odo" data-odo="water" data-digits="7"></span><small>لیتر آب</small><span class="sub" data-sub="tubs"></span></div>
+              <svg class="tank" viewBox="0 0 120 240" aria-hidden="true">
+                <defs><clipPath id="tclip-ab"><rect x="14" y="14" width="92" height="196" rx="18"/></clipPath>
+                  <linearGradient id="tw-ab" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#62d9ff"/><stop offset="1" stop-color="#0a7fa8"/></linearGradient></defs>
+                <rect class="t-leg" x="24" y="206" width="10" height="34" rx="2"/><rect class="t-leg" x="86" y="206" width="10" height="34" rx="2"/>
+                <rect class="t-leg" x="104" y="189" width="16" height="14" rx="2"/>
+                <g clip-path="url(#tclip-ab)"><g class="t-water" transform="translate(0 210)"><g class="t-wave"><path d="M0 6 Q15 0 30 6 T60 6 T90 6 T120 6 T150 6 T180 6 V260 H0z" fill="url(#tw-ab)" opacity=".92"/></g></g></g>
+                <rect class="t-glass" x="14" y="14" width="92" height="196" rx="18"/>
+                <rect class="t-shine" x="24" y="30" width="7" height="150" rx="3.5"/>
+                <g class="t-ticks"><line class="t-tick" x1="92" y1="60" x2="104" y2="60"/><line class="t-tick" x1="96" y1="85" x2="104" y2="85"/><line class="t-tick" x1="92" y1="110" x2="104" y2="110"/><line class="t-tick" x1="96" y1="135" x2="104" y2="135"/><line class="t-tick" x1="92" y1="160" x2="104" y2="160"/></g>
+              </svg>
+            </div>
+          </div>
+          <div class="ground"></div>
+        </div>
+      <div class="hs-sum"><p class="sum-text" data-sum></p><a class="hero-btn" href="tel:02192001017">مشاوره با کارشناس فروش</a></div>
+    </div></div></div>
+  </section>
+
+  <p class="foot-note"><b>*</b> محاسبات بر اساس فرمول‌های محاسبه‌گر فعلی آبادیس</p>
+
+  <section class="cta-band">
+    <h2>برای محاسبه دقیق مرکز درمانی خود با ما صحبت کنید</h2>
+    <p>کارشناسان فروش مخازن طبی آبادیس آماده پاسخ‌گویی به پرسش‌های شما هستند.</p>
+    <a class="hero-btn" href="tel:02192001017">مشاوره با کارشناس فروش</a>
+    <p class="cta-sub">مرکز تماس: <a href="tel:02192001017" dir="ltr">021-92001017</a> · <a href="https://abadis-med.com/ارتباط-با-ما/" target="_blank" rel="noopener">صفحه ارتباط با ما</a></p>
+  </section>
+
+  <footer class="site-footer" id="contact">
+    <div class="foot-inner">
+      <div class="foot-brand">
+        <strong>مخازن طبی آبادیس</strong>
+        <span>با ما در ارتباط باشید...</span>
+        <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;align-items:flex-start">
+          <a href="https://abadis-med.com/ارتباط-با-ما/" target="_blank" rel="noopener">صفحه ارتباط با ما</a>
+          <a href="https://abadis-med.com/" target="_blank" rel="noopener">abadis-med.com</a>
+        </div>
+      </div>
+      <div>
+        <h3>تماس</h3>
+        <dl>
+          <dt>مرکز تماس:</dt><dd><a href="tel:+982192001017" dir="ltr">02192001017</a></dd>
+          <dt>تلفن تماس:</dt><dd><a href="tel:+982122671845" dir="ltr">02122671845</a> | <a href="tel:+982122205502" dir="ltr">02122205502</a><br><a href="tel:+982122215503" dir="ltr">02122215503</a> | <a href="tel:+982122218910" dir="ltr">02122218910</a></dd>
+          <dt>فکس:</dt><dd><span dir="ltr">02141425555</span> | داخلی 28544</dd>
+          <dt>پست الکترونیک:</dt><dd><a href="mailto:info@abadis-med.com">info@abadis-med.com</a></dd>
+          <dt>واتس‌اپ:</dt><dd><a href="https://wa.me/989100145809" target="_blank" rel="noopener" dir="ltr">+989100145809</a></dd>
+        </dl>
+      </div>
+      <div>
+        <h3>نشانی</h3>
+        <p><b>نشانی دفتر مرکزی:</b><br>ایران، تهران، قیطریه، خیابان اندرزگو، پلاک 104، واحد2</p>
+        <p><b>نشانی کارخانه:</b><br>ایران،تهران،شهرک صنعتی شمس آباد، بلوار گلستان، کوچه گلشن ۱۹،پلاک۱۷</p>
+      </div>
+    </div>
+    <div class="foot-copy">مخازن طبی آبادیس · محاسبه‌گر صرفه‌جویی · طرح بیمارستان</div>
+  </footer>
+
+  <script src="../common/abadis-common.js"></script>
+  <script>
+
+    (() => {
+      const A = Abadis, fa = A.fa, clamp = A.clamp;
+      function setup(root, kind) {
+        const groups = {}; root.querySelectorAll('[data-icons]').forEach((g) => { groups[g.dataset.icons] = [...g.querySelectorAll('.l')]; });
+        const floors = {}; root.querySelectorAll('[data-floor]').forEach((f) => { floors[f.dataset.floor] = f; });
+        const sub = {}; root.querySelectorAll('[data-sub]').forEach((e) => { sub[e.dataset.sub] = e; });
+        const water = root.querySelector('.t-water'), flow = root.querySelector('.flow'), ecg = root.querySelector('.ecg');
+        const sum = root.querySelector('[data-sum]'), hint = root.querySelector('[data-hint]');
+        const light = (key, count) => groups[key].forEach((l, i) => { l.style.opacity = clamp(count - i, 0, 1).toFixed(3); });
+        return A.createCalc(root, kind, (s) => {
+          if (kind === 'surgery') {
+            light('n', s.disp.n / 1000);
+            floors.n.style.setProperty('--glow', s.fr.input.toFixed(3));
+            ecg.style.opacity = (0.15 + 0.85 * s.fr.input).toFixed(3);
+          } else {
+            light('a', s.disp.a / 20); light('b', s.disp.b / 20);
+            floors.a.style.setProperty('--glow', s.fr.a.toFixed(3)); floors.b.style.setProperty('--glow', s.fr.b.toFixed(3));
+            floors.a.classList.toggle('active', s.phase === 'a'); floors.b.classList.toggle('active', s.phase === 'b');
+            floors.a.classList.toggle('held', s.phase === 'b' || s.lockedA != null);
+            hint.textContent = s.phase === 'a' ? (s.lockedA != null ? 'تخت اتاق عمل روی ' + fa(s.lockedA) + ' ثابت است' : 'مرحله ۱: با اسکرول، تخت‌های اتاق عمل روشن می‌شوند') : 'مرحله ۲: با اسکرول، تخت‌های ICU|CCU روشن می‌شوند';
+          }
+          const wf = A.visCurve(s.fr.water);
+          water.setAttribute('transform', 'translate(0 ' + (210 - wf * 186).toFixed(2) + ')');
+          flow.style.opacity = s.W > 0 ? (0.45 + 0.55 * Math.min(1, s.fr.water * 3)).toFixed(2) : '0';
+          sub.tubs.innerHTML = s.W > 0 ? '≈ <b>' + fa(s.W / 200) + '</b> وان ۲۰۰ لیتری (تقریبی)' : 'وان ۲۰۰ لیتری (تقریبی)';
+          sub.read.innerHTML = s.C >= 1e6 ? '≈ <b>' + A.readableToman(s.C) + '</b>' : '';
+          sub.shifts.innerHTML = s.H > 0 ? '≈ <b>' + fa(s.H / 8) + '</b> شیفت کاری ۸ ساعته' : '';
+          const has = kind === 'surgery' ? s.disp.n > 0 : (s.disp.a + s.disp.b) > 0;
+          const lead = kind === 'surgery' ? 'با <b>' + fa(s.disp.n) + '</b> عمل جراحی در سال' : 'با <b>' + fa(s.disp.a) + '</b> تخت اتاق عمل و <b>' + fa(s.disp.b) + '</b> تخت ICU|CCU';
+          sum.innerHTML = has
+            ? lead + ': حدود <b>' + fa(s.W) + '</b> لیتر آب، <b>' + fa(s.C) + '</b> تومان هزینه شست‌وشو و ضدعفونی و <b>' + fa(s.H) + '</b> ساعت از زمان کادر درمان.<span class="sum-note">* محاسبات بر اساس فرمول‌های محاسبه‌گر فعلی آبادیس</span>'
+            : (kind === 'surgery' ? 'اسکرول کنید تا اتاق‌های عمل بیمارستان روشن شوند.' : 'اسکرول کنید تا تخت‌های اتاق عمل روشن شوند.');
+        });
+      }
+      setup(document.getElementById('calc1'), 'surgery');
+      setup(document.getElementById('calc2'), 'beds');
+      A.start();
+    })();
+
+  </script>
+</body>
+</html>
