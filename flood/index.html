@@ -24,34 +24,55 @@
     [data-theme="dark"] .fl-sec { background: linear-gradient(180deg, #071d20 0%, #0a2427 60%); }
     #calc1 .calc-track { height: 430vh; }
     #calc2 .calc-track { height: 680vh; }
-    .calc-pin { padding: 0; }
-    .fl-top { position: absolute; z-index: 1; top: 0; left: 0; right: 0; padding: 92px 24px 0; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 2px; }
-    .fl-top h2 { font-size: 1.05rem; font-weight: 800; color: var(--muted); }
-    .fl-big { display: flex; justify-content: center; align-items: baseline; gap: 4vw; }
-    .fl-big .odo { font-size: clamp(4.6rem, 11vw, 9rem); color: var(--teal-dark); line-height: var(--cell); }
-    [data-theme="dark"] .fl-big .odo { color: #e6f3f3; }
-    #calc2 .fl-big .odo { font-size: clamp(3rem, 7vw, 5.6rem); }
-    .fl-in { display: flex; flex-direction: column; align-items: center; transition: opacity .3s; }
+    .calc-pin { padding: 0; --lav1: #c9bdfb; --lav2: #9d8cf0; --lav3: #7f6ee0; }
+    [data-theme="dark"] .calc-pin { --lav1: #8f7fe6; --lav2: #6a58c9; --lav3: #4a3c9e; }
+    .fl-top { position: absolute; z-index: 1; top: 0; left: 0; right: 0; padding: 88px 24px 0; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .fl-top h2 { font-size: 1rem; font-weight: 800; color: var(--muted); }
+    .fl-inrow { display: flex; justify-content: center; align-items: baseline; gap: 22px; flex-wrap: wrap; }
+    .fl-in { display: inline-flex; align-items: baseline; gap: 8px; font-size: .9rem; font-weight: 800; color: var(--muted); transition: opacity .3s; }
+    .fl-in .odo { font-size: 2.3rem; color: var(--teal); }
+    [data-theme="dark"] .fl-in .odo { color: #2ec4c6; }
     .fl-in.idle { opacity: .45; }
-    .fl-in .lb { font-size: .9rem; font-weight: 800; color: var(--muted); display: inline-flex; gap: 8px; align-items: center; }
     .fl-in .hold { font-size: .62rem; font-weight: 800; background: var(--accent); color: #072326; border-radius: 999px; padding: 0 7px; opacity: 0; transition: opacity .3s; }
     .fl-in.held .hold { opacity: 1; }
-    .fl-hint { font-size: .78rem; color: var(--muted); margin-top: 2px; }
-    .fl-top .chips { margin-top: 8px; justify-content: center; max-width: 100%; }
+    .fl-head { margin-top: 4px; display: flex; flex-direction: column; align-items: center; }
+    .fl-head .lb { font-size: .86rem; font-weight: 800; color: var(--muted); }
+    .fl-head .val { display: flex; align-items: baseline; gap: 10px; }
+    .fl-head .odo { font-size: clamp(2.6rem, 6.4vw, 5.2rem); color: var(--teal-dark); }
+    [data-theme="dark"] .fl-head .odo { color: #e6f3f3; }
+    .fl-head .u { font-size: 1.1rem; font-weight: 900; color: var(--teal); }
+    [data-theme="dark"] .fl-head .u { color: #2ec4c6; }
+    .fl-hint { font-size: .76rem; color: var(--muted); margin-top: 2px; }
+    .fl-top .chips { margin-top: 6px; justify-content: center; max-width: 100%; }
     .fl-top .chip { background: transparent; }
     .fl-top .confirm { margin-top: 6px; }
-    .sea { position: absolute; z-index: 2; left: 0; right: 0; top: 0; bottom: 0; transform: translateY(78%); transition: transform .5s cubic-bezier(.2,.75,.25,1); will-change: transform; pointer-events: none; }
-    .sea .waves { position: absolute; left: -100%; top: -38px; width: 200%; height: 40px; animation: drift 9s linear infinite; }
-    .sea .waves.w2 { animation-duration: 6s; animation-direction: reverse; top: -30px; }
+
+    .sea { position: absolute; z-index: 2; left: 0; right: 0; top: 0; bottom: 0; transform: translateY(70%); transition: transform .5s cubic-bezier(.2,.75,.25,1); will-change: transform; pointer-events: none; }
+    .waves { position: absolute; left: -100%; top: -38px; width: 200%; height: 40px; animation: drift 9s linear infinite; }
+    .waves.w2 { animation-duration: 6s; animation-direction: reverse; top: -30px; }
     @keyframes drift { to { transform: translateX(50%); } }
     .sea .body { position: absolute; inset: 0; background: linear-gradient(180deg, #3fcbd0 0%, #149aa0 30%, #05686b 75%); }
     [data-theme="dark"] .sea .body { background: linear-gradient(180deg, #1aa6ab 0%, #0b6f74 30%, #043d40 75%); }
-    .sea .body::before { content: ""; position: absolute; inset: 0; background: radial-gradient(40% 20% at 20% 18%, rgba(255,255,255,.16), transparent 70%), radial-gradient(30% 16% at 80% 34%, rgba(255,255,255,.10), transparent 70%), repeating-linear-gradient(180deg, rgba(255,255,255,.05) 0 2px, transparent 2px 22px); }
-    .bubbles span { position: absolute; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.5); animation: rise 7s ease-in infinite; }
-    @keyframes rise { 0% { transform: translateY(40px); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(-120px); opacity: 0; } }
-    .floats { position: absolute; left: 0; right: 0; top: -30px; display: flex; justify-content: center; align-items: flex-start; gap: 4vw; padding: 0 20px; }
+    .sea .body::before { content: ""; position: absolute; inset: 0; background: radial-gradient(40% 20% at 20% 18%, rgba(255,255,255,.16), transparent 70%), repeating-linear-gradient(180deg, rgba(255,255,255,.05) 0 2px, transparent 2px 22px); }
+    /* washing & disinfection fluid layer (visual share only) */
+    .fluid { position: absolute; left: 0; right: 0; top: 0; bottom: 0; transform: translateY(100%); transition: transform .5s cubic-bezier(.2,.75,.25,1); will-change: transform; }
+    .fluid .fbody { position: absolute; inset: 0; background: linear-gradient(180deg, var(--lav1) 0%, var(--lav2) 22%, var(--lav3) 70%); opacity: .93; }
+    .fluid .fbody::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 14% 12%, rgba(255,255,255,.55) 0 2.5px, transparent 3.5px), radial-gradient(circle at 31% 26%, rgba(255,255,255,.45) 0 1.8px, transparent 2.8px), radial-gradient(circle at 63% 9%, rgba(255,255,255,.5) 0 2.2px, transparent 3.2px), radial-gradient(circle at 82% 22%, rgba(255,255,255,.4) 0 1.6px, transparent 2.6px), radial-gradient(circle at 47% 34%, rgba(255,255,255,.35) 0 1.6px, transparent 2.6px), radial-gradient(60% 30% at 70% 0%, rgba(255,255,255,.22), transparent 70%); }
+    .fluid .waves { top: -14px; height: 16px; animation-duration: 7s; }
+    .fluid .fline { position: absolute; left: 0; right: 0; top: 0; height: 2px; background: rgba(255,255,255,.7); }
+    .flabel { position: absolute; left: 50%; top: 0; transform: translate(-50%, -50%); transition: transform .5s cubic-bezier(.2,.75,.25,1); z-index: 3; }
+    .flabel .tag { background: #f6f3ff; border-radius: 16px; padding: 5px 16px 3px; display: flex; align-items: center; gap: 8px; white-space: nowrap; box-shadow: 0 12px 26px rgba(60,40,140,.25), inset 0 -3px 0 rgba(127,110,224,.18); }
+    [data-theme="dark"] .flabel .tag { background: #241d4d; box-shadow: 0 12px 26px rgba(0,0,0,.4), inset 0 0 0 1px rgba(201,189,251,.35); }
+    .flabel .k { font-size: .74rem; font-weight: 800; color: #5b4bb8; }
+    [data-theme="dark"] .flabel .k { color: #cfc4ff; }
+    .flabel .odo { font-size: 1.35rem; color: #3b2d8f; }
+    [data-theme="dark"] .flabel .odo { color: #e6e0ff; }
+    .flabel .u { font-size: .74rem; font-weight: 800; color: #6c5fb0; }
+    [data-theme="dark"] .flabel .u { color: #cfc4ff; }
+    /* surface tags */
+    .floats { position: absolute; left: 0; right: 0; top: -30px; display: flex; justify-content: center; align-items: flex-start; gap: 12vw; padding: 0 20px; z-index: 4; }
     .buoy { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; animation: bob 4.2s ease-in-out infinite; }
-    .buoy:nth-child(2) { animation-delay: -1.4s; } .buoy:nth-child(3) { animation-delay: -2.8s; }
+    .buoy:nth-child(2) { animation-delay: -2.1s; }
     @keyframes bob { 50% { transform: translateY(5px) rotate(-1deg); } }
     .buoy .tag { background: #fff; border-radius: 18px; padding: 6px 18px 4px; box-shadow: 0 14px 30px rgba(5,60,62,.22), inset 0 -3px 0 rgba(5,104,107,.12); display: flex; align-items: center; gap: 8px; white-space: nowrap; }
     [data-theme="dark"] .buoy .tag { background: #0f3337; box-shadow: 0 14px 30px rgba(0,0,0,.4), inset 0 0 0 1px rgba(46,196,198,.3); }
@@ -61,40 +82,77 @@
     .buoy .odo { font-size: 1.7rem; color: var(--ink); }
     [data-theme="dark"] .buoy .odo { color: #2ec4c6; }
     .buoy .u { font-size: .82rem; font-weight: 800; color: var(--muted); }
-    .buoy .cap { margin-top: 12px; font-size: .84rem; font-weight: 800; color: #fff; }
-    .buoy .eq { font-size: .76rem; color: rgba(255,255,255,.82); min-height: 1.3em; }
-    .fl-foot { position: absolute; z-index: 3; left: 0; right: 0; bottom: 22px; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 0 16px; text-align: center; }
-    .fl-sum { font-size: .82rem; color: #fff; max-width: 720px; line-height: 1.7; text-shadow: 0 1px 2px rgba(0,0,0,.25); }
+    .buoy .cap { margin-top: 10px; font-size: .84rem; font-weight: 800; color: #fff; }
+    .buoy .eq { font-size: .76rem; color: rgba(255,255,255,.85); min-height: 1.3em; }
+    /* floating staff figures */
+    .crew { position: absolute; left: 0; right: 0; top: 0; height: 0; z-index: 2; }
+    .fig { position: absolute; width: 50px; height: 58px; margin-left: -25px; opacity: 0; transform: scale(.55); transition: opacity .4s, transform .45s cubic-bezier(.3,1.5,.5,1); }
+    .fig.on { transform: none; }
+    .fig svg { width: 100%; height: 100%; overflow: visible; animation: float 3.6s ease-in-out infinite; }
+    .fig:nth-child(2n) svg { animation-duration: 4.4s; animation-delay: -1.2s; }
+    .fig:nth-child(3n) svg { animation-duration: 3.1s; animation-delay: -2.2s; }
+    @keyframes float { 0%, 100% { transform: translate(0, 0) rotate(-3deg); } 50% { transform: translate(5px, 5px) rotate(3deg); } }
+    .f-body { fill: #05686b; } .f-head { fill: #0b4f52; } .f-cap { fill: #fff; } .f-cross { fill: #2ec4c6; }
+    .f-ring { fill: none; stroke: #fff; stroke-width: 6; } .f-ring2 { fill: none; stroke: #ff8f7e; stroke-width: 6; stroke-dasharray: 9 11; }
+    [data-theme="dark"] .f-body { fill: #2ec4c6; } [data-theme="dark"] .f-head { fill: #8fe3e4; } [data-theme="dark"] .f-cross { fill: #05686b; }
+    /* foot */
+    .fl-foot { position: absolute; z-index: 5; left: 0; right: 0; bottom: 18px; display: flex; flex-direction: column; align-items: center; gap: 7px; padding: 0 16px; text-align: center; }
+    .legend { display: flex; justify-content: center; align-items: center; gap: 6px 14px; flex-wrap: wrap; font-size: .74rem; font-weight: 700; color: #fff; background: rgba(4,40,42,.28); border-radius: 999px; padding: 4px 14px; }
+    .legend span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+    .legend i { width: 12px; height: 12px; border-radius: 4px; display: inline-block; }
+    .legend .lw { background: linear-gradient(#3fcbd0, #05686b); border: 1px solid rgba(255,255,255,.6); }
+    .legend .lf { background: linear-gradient(var(--lav1), var(--lav3)); border: 1px solid rgba(255,255,255,.6); }
+    .legend svg { width: 14px; height: 16px; }
+    .fl-sum { font-size: .8rem; color: #fff; max-width: 760px; line-height: 1.7; text-shadow: 0 1px 2px rgba(0,0,0,.25); }
     .fl-sum b { font-weight: 900; color: #e9fdfd; }
-    .fl-foot .hero-btn { background: #fff; color: #05686b; box-shadow: 0 10px 30px rgba(0,0,0,.18); }
+    .fl-foot .hero-btn { background: #fff; color: #05686b; box-shadow: 0 10px 30px rgba(0,0,0,.18); padding: 11px 22px; font-size: .86rem; }
     [data-theme="dark"] .fl-foot .hero-btn { background: #2ec4c6; color: #072326; }
-    .fl-foot .note { font-size: .7rem; color: rgba(255,255,255,.78); }
+    .fl-foot .note { font-size: .68rem; color: rgba(255,255,255,.8); }
     @media (max-width: 860px) {
-      .fl-top { padding-top: 70px; padding-left: 12px; padding-right: 12px; }
-      .fl-top h2 { font-size: .84rem; }
-      .fl-big .odo { font-size: 4.4rem; }
-      #calc2 .fl-big .odo { font-size: 2.7rem; }
-      .fl-big { gap: 26px; }
-      .fl-in .lb { font-size: .72rem; }
-      .fl-hint { font-size: .68rem; }
-      .floats { gap: 6px; padding: 0 6px; top: -38px; }
-      .buoy .tag { flex-direction: column; gap: 0; padding: 5px 10px 3px; border-radius: 14px; }
+      .fl-top { padding: 66px 10px 0; }
+      .fl-top h2 { font-size: .8rem; }
+      .fl-inrow { gap: 14px; }
+      .fl-in { font-size: .7rem; gap: 6px; }
+      .fl-in .odo { font-size: 1.7rem; }
+      #calc2 .fl-in .odo { font-size: 1.45rem; }
+      .fl-head .lb { font-size: .7rem; }
+      .fl-head .odo { font-size: 2.05rem; }
+      .fl-head .u { font-size: .8rem; }
+      .fl-hint { font-size: .64rem; }
+      .floats { gap: 10px; padding: 0 10px; top: -36px; justify-content: space-between; }
+      .buoy .tag { flex-direction: column; gap: 0; padding: 5px 12px 3px; border-radius: 14px; }
       .buoy .tag i { display: none; }
-      .buoy .odo { font-size: 1.02rem; }
+      .buoy .odo { font-size: 1.1rem; }
       .buoy .u { font-size: .6rem; }
-      .buoy .cap { margin-top: 8px; font-size: .62rem; }
-      .buoy .eq { font-size: .56rem; }
-      .fl-foot { bottom: 14px; gap: 6px; }
-      .fl-sum { font-size: .66rem; line-height: 1.6; }
-      .fl-foot .hero-btn { padding: 10px 20px; font-size: .82rem; }
-      .fl-foot .note { font-size: .6rem; }
+      .buoy .cap { margin-top: 6px; font-size: .64rem; }
+      .buoy .eq { font-size: .58rem; }
+      .fig { width: 34px; height: 40px; margin-left: -17px; }
+      .flabel .tag { padding: 4px 12px 2px; gap: 6px; }
+      .flabel .k { font-size: .6rem; }
+      .flabel .odo { font-size: 1rem; }
+      .flabel .u { font-size: .6rem; }
+      .fl-foot { bottom: 12px; gap: 5px; }
+      .legend { font-size: .58rem; gap: 3px 10px; padding: 3px 10px; }
+      .legend i { width: 10px; height: 10px; }
+      .fl-sum { display: none; }
+      .fl-foot .hero-btn { padding: 9px 18px; font-size: .78rem; }
+      .fl-foot .note { font-size: .58rem; }
     }
-    @media (prefers-reduced-motion: reduce) { .sea { transition: none; } }
+    @media (prefers-reduced-motion: reduce) { .sea, .fluid, .flabel, .fig { transition: none; } }
 
   </style>
 </head>
 <body>
-
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+    <symbol id="i-crew" viewBox="0 0 50 58">
+      <path class="f-body" d="M8 30 Q4 18 10 14 Q12 22 17 26 L33 26 Q38 22 40 14 Q46 18 42 30 L38 44 L12 44 Z"/>
+      <circle class="f-head" cx="25" cy="15" r="8.5"/>
+      <path class="f-cap" d="M16.5 11.5 Q25 3 33.5 11.5 L33 13 L17 13 Z"/>
+      <path class="f-cross" d="M24 6.6h2v1.6h1.6v2H26v1.6h-2V10.2h-1.6v-2H24z"/>
+      <ellipse class="f-ring" cx="25" cy="43" rx="19" ry="7"/>
+      <ellipse class="f-ring2" cx="25" cy="43" rx="19" ry="7"/>
+    </symbol>
+  </defs></svg>
   <header class="header" id="header">
     <a class="logo" href="#top">آبادیس<span>مخازن طبی</span></a>
     <nav class="nav">
@@ -114,36 +172,45 @@
   <section class="intro" id="top">
     <div class="eyebrow">ابزار محاسبه · طرح سیلاب</div>
     <h1>صرفه‌جویی که <em>بالا می‌آید</em></h1>
-    <p>اسکرول کنید؛ سطح آب صرفه‌جویی‌شده بالا می‌آید و اعداد روی آب شناور می‌شوند.</p>
+    <p>اسکرول کنید؛ آب و مایع شست‌وشوی صرفه‌جویی‌شده بالا می‌آیند و کادر درمانِ آزادشده روی آب شناور می‌شود.</p>
   </section>
 
-  <section class="calc fl-sec" id="calc1" aria-labelledby="calc1-t">
+  <section class="calc fl-sec" id="calc1" aria-labelledby="calc1-t" data-per="200">
     <div class="calc-track"><div class="calc-pin">
-      <div class="fl-top"><h2 id="calc1-t">بر مبنای تعداد عمل جراحی در سال</h2><div class="fl-big"><div class="fl-in"><span class="odo" data-odo="n" data-digits="5"></span><span class="lb">عمل جراحی در سال</span></div></div><p class="fl-hint" data-hint>اسکرول کنید تا آب صرفه‌جویی‌شده بالا بیاید</p><div class="chips" role="group" aria-label="مقادیر آماده">
+      <div class="fl-top"><h2 id="calc1-t">بر مبنای تعداد عمل جراحی در سال</h2><div class="fl-inrow"><span class="fl-in"><span class="odo" data-odo="n" data-digits="5"></span>عمل جراحی در سال</span></div>
+        <div class="fl-head"><span class="lb">صرفه‌جویی در هزینه شست‌وشو و ضدعفونی</span><span class="val"><span class="odo" data-odo="cost" data-digits="13"></span><span class="u">تومان</span></span></div>
+        <p class="fl-hint" data-hint>اسکرول کنید تا آب و مایع شست‌وشو بالا بیاید</p><div class="chips" role="group" aria-label="مقادیر آماده">
               <button class="chip" type="button" data-n="1000">۱٬۰۰۰</button>
               <button class="chip" type="button" data-n="5000">۵٬۰۰۰</button>
               <button class="chip" type="button" data-n="10000">۱۰٬۰۰۰</button>
               <button class="chip" type="button" data-n="15000">۱۵٬۰۰۰</button>
               <button class="chip" type="button" data-n="30000">۳۰٬۰۰۰</button>
             </div></div>
-      <div class="sea" aria-hidden="false">
+      <div class="sea">
         <svg class="waves" viewBox="0 0 2880 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 22 C120 6 240 6 360 20 S600 36 720 22 S960 6 1080 20 S1320 36 1440 22 C1560 6 1680 6 1800 20 S2040 36 2160 22 S2400 6 2520 20 S2760 36 2880 22 V40 H0 Z" fill="#7fe3f0" opacity=".5"/></svg>
         <svg class="waves w2" viewBox="0 0 2880 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 22 C160 8 280 10 400 22 S640 34 780 22 S1040 8 1180 20 S1360 32 1440 22 C1600 8 1720 10 1840 22 S2080 34 2220 22 S2480 8 2620 20 S2800 32 2880 22 V40 H0 Z" fill="#3fcbd0"/></svg>
         <div class="body"></div>
-        <div class="bubbles" aria-hidden="true"><span style="width:14px;height:14px;left:12%;top:40%"></span><span style="width:8px;height:8px;left:16%;top:32%;animation-delay:-2s"></span><span style="width:10px;height:10px;right:18%;top:44%;animation-delay:-4s"></span><span style="width:6px;height:6px;right:22%;top:36%;animation-delay:-1s"></span><span style="width:12px;height:12px;left:46%;top:52%;animation-delay:-5s"></span></div>
+        <div class="fluid"><svg class="waves" viewBox="0 0 2880 16" preserveAspectRatio="none" aria-hidden="true"><path d="M0 9 C180 2 300 2 480 9 S780 16 960 9 S1260 2 1440 9 C1620 2 1740 2 1920 9 S2220 16 2400 9 S2700 2 2880 9 V16 H0 Z" fill="var(--lav1)"/></svg><div class="fbody"></div><span class="fline"></span>
+          <div class="flabel"><div class="tag"><span class="k">هزینه شست‌وشو و ضدعفونی</span><span class="odo" data-odo="cost" data-digits="13"></span><span class="u">تومان</span></div></div>
+        </div>
+        <div class="crew" aria-hidden="true"><span class="fig" data-row="0" style="left:50%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span><span class="fig" data-row="1" style="left:24%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span><span class="fig" data-row="1" style="left:76%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span><span class="fig" data-row="0" style="left:12%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span><span class="fig" data-row="0" style="left:88%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span><span class="fig" data-row="1" style="left:38%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span><span class="fig" data-row="1" style="left:62%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span><span class="fig" data-row="0" style="left:30%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span><span class="fig" data-row="0" style="left:70%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span></div>
         <div class="floats">
-          <div class="buoy"><div class="tag"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3s6 6.6 6 11a6 6 0 0 1-12 0c0-4.4 6-11 6-11z"/></svg></i><span class="odo" data-odo="water" data-digits="7"></span><span class="u">لیتر</span></div><span class="cap">صرفه‌جویی آب</span><span class="eq" data-sub="tubs"></span></div>
-          <div class="buoy"><div class="tag"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/></svg></i><span class="odo" data-odo="cost" data-digits="13"></span><span class="u">تومان</span></div><span class="cap">هزینه شست‌وشو و ضدعفونی</span><span class="eq" data-sub="read"></span></div>
+          <div class="buoy"><div class="tag"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3s6 6.6 6 11a6 6 0 0 1-12 0c0-4.4 6-11 6-11z"/></svg></i><span class="odo" data-odo="water" data-digits="7"></span><span class="u">لیتر آب</span></div><span class="cap">صرفه‌جویی آب</span><span class="eq" data-sub="tubs"></span></div>
           <div class="buoy"><div class="tag"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></i><span class="odo" data-odo="hours" data-digits="6"></span><span class="u">ساعت</span></div><span class="cap">زمان کادر درمان</span><span class="eq" data-sub="shifts"></span></div>
         </div>
       </div>
-      <div class="fl-foot"><p class="fl-sum" data-sum></p><a class="hero-btn" href="tel:02192001017">مشاوره با کارشناس فروش</a><p class="note">* محاسبات بر اساس فرمول‌های محاسبه‌گر فعلی آبادیس</p></div>
+      <div class="fl-foot">
+        <div class="legend"><span><i class="lw"></i>آب</span><span><i class="lf"></i>مایع شست‌وشو و ضدعفونی (نمایش تصویری)</span><span><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg>هر آدمک = ۲۰۰ شیفت کاری ۸ ساعته</span></div>
+        <p class="fl-sum" data-sum></p><a class="hero-btn" href="tel:02192001017">مشاوره با کارشناس فروش</a><p class="note">* محاسبات بر اساس فرمول‌های محاسبه‌گر فعلی آبادیس</p>
+      </div>
     </div></div>
   </section>
 
-  <section class="calc fl-sec" id="calc2" aria-labelledby="calc2-t">
+  <section class="calc fl-sec" id="calc2" aria-labelledby="calc2-t" data-per="1500">
     <div class="calc-track"><div class="calc-pin">
-      <div class="fl-top"><h2 id="calc2-t">بر مبنای تعداد تخت</h2><div class="fl-big"><div class="fl-in" data-ch="a"><span class="odo" data-odo="a" data-digits="3"></span><span class="lb">تخت اتاق عمل <span class="hold">ثابت</span></span></div><div class="fl-in" data-ch="b"><span class="odo" data-odo="b" data-digits="3"></span><span class="lb">تخت ICU|CCU</span></div></div><p class="fl-hint" data-hint>مرحله ۱: با اسکرول، تعداد تخت اتاق عمل را تنظیم کنید</p><div class="chips" role="group" aria-label="ترکیب‌های آماده (تخت اتاق عمل + ICU|CCU)">
+      <div class="fl-top"><h2 id="calc2-t">بر مبنای تعداد تخت</h2><div class="fl-inrow"><span class="fl-in" data-ch="a">تخت اتاق عمل <span class="odo" data-odo="a" data-digits="3"></span><span class="hold">ثابت</span></span><span class="fl-in" data-ch="b">تخت ICU|CCU <span class="odo" data-odo="b" data-digits="3"></span></span></div>
+        <div class="fl-head"><span class="lb">صرفه‌جویی در هزینه شست‌وشو و ضدعفونی</span><span class="val"><span class="odo" data-odo="cost" data-digits="11"></span><span class="u">تومان</span></span></div>
+        <p class="fl-hint" data-hint>مرحله ۱: با اسکرول، تعداد تخت اتاق عمل را تنظیم کنید</p><div class="chips" role="group" aria-label="ترکیب‌های آماده (تخت اتاق عمل + ICU|CCU)">
               <button class="chip" type="button" data-a="10" data-b="10">۱۰ + ۱۰</button>
               <button class="chip" type="button" data-a="20" data-b="10">۲۰ + ۱۰</button>
               <button class="chip" type="button" data-a="50" data-b="20">۵۰ + ۲۰</button>
@@ -151,18 +218,23 @@
               <button class="chip" type="button" data-a="300" data-b="100">۳۰۰ + ۱۰۰</button>
               <button class="chip" type="button" data-a="700" data-b="700">۷۰۰ + ۷۰۰</button>
             </div><button class="confirm" type="button" data-confirm hidden></button></div>
-      <div class="sea" aria-hidden="false">
+      <div class="sea">
         <svg class="waves" viewBox="0 0 2880 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 22 C120 6 240 6 360 20 S600 36 720 22 S960 6 1080 20 S1320 36 1440 22 C1560 6 1680 6 1800 20 S2040 36 2160 22 S2400 6 2520 20 S2760 36 2880 22 V40 H0 Z" fill="#7fe3f0" opacity=".5"/></svg>
         <svg class="waves w2" viewBox="0 0 2880 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 22 C160 8 280 10 400 22 S640 34 780 22 S1040 8 1180 20 S1360 32 1440 22 C1600 8 1720 10 1840 22 S2080 34 2220 22 S2480 8 2620 20 S2800 32 2880 22 V40 H0 Z" fill="#3fcbd0"/></svg>
         <div class="body"></div>
-        <div class="bubbles" aria-hidden="true"><span style="width:14px;height:14px;left:12%;top:40%"></span><span style="width:8px;height:8px;left:16%;top:32%;animation-delay:-2s"></span><span style="width:10px;height:10px;right:18%;top:44%;animation-delay:-4s"></span><span style="width:6px;height:6px;right:22%;top:36%;animation-delay:-1s"></span><span style="width:12px;height:12px;left:46%;top:52%;animation-delay:-5s"></span></div>
+        <div class="fluid"><svg class="waves" viewBox="0 0 2880 16" preserveAspectRatio="none" aria-hidden="true"><path d="M0 9 C180 2 300 2 480 9 S780 16 960 9 S1260 2 1440 9 C1620 2 1740 2 1920 9 S2220 16 2400 9 S2700 2 2880 9 V16 H0 Z" fill="var(--lav1)"/></svg><div class="fbody"></div><span class="fline"></span>
+          <div class="flabel"><div class="tag"><span class="k">هزینه شست‌وشو و ضدعفونی</span><span class="odo" data-odo="cost" data-digits="11"></span><span class="u">تومان</span></div></div>
+        </div>
+        <div class="crew" aria-hidden="true"><span class="fig" data-row="0" style="left:50%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span><span class="fig" data-row="1" style="left:24%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span><span class="fig" data-row="1" style="left:76%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span><span class="fig" data-row="0" style="left:12%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span><span class="fig" data-row="0" style="left:88%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span><span class="fig" data-row="1" style="left:38%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span><span class="fig" data-row="1" style="left:62%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span><span class="fig" data-row="0" style="left:30%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span><span class="fig" data-row="0" style="left:70%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span></div>
         <div class="floats">
-          <div class="buoy"><div class="tag"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3s6 6.6 6 11a6 6 0 0 1-12 0c0-4.4 6-11 6-11z"/></svg></i><span class="odo" data-odo="water" data-digits="7"></span><span class="u">لیتر</span></div><span class="cap">صرفه‌جویی آب</span><span class="eq" data-sub="tubs"></span></div>
-          <div class="buoy"><div class="tag"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/></svg></i><span class="odo" data-odo="cost" data-digits="11"></span><span class="u">تومان</span></div><span class="cap">هزینه شست‌وشو و ضدعفونی</span><span class="eq" data-sub="read"></span></div>
+          <div class="buoy"><div class="tag"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3s6 6.6 6 11a6 6 0 0 1-12 0c0-4.4 6-11 6-11z"/></svg></i><span class="odo" data-odo="water" data-digits="7"></span><span class="u">لیتر آب</span></div><span class="cap">صرفه‌جویی آب</span><span class="eq" data-sub="tubs"></span></div>
           <div class="buoy"><div class="tag"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></i><span class="odo" data-odo="hours" data-digits="6"></span><span class="u">ساعت</span></div><span class="cap">زمان کادر درمان</span><span class="eq" data-sub="shifts"></span></div>
         </div>
       </div>
-      <div class="fl-foot"><p class="fl-sum" data-sum></p><a class="hero-btn" href="tel:02192001017">مشاوره با کارشناس فروش</a><p class="note">* محاسبات بر اساس فرمول‌های محاسبه‌گر فعلی آبادیس</p></div>
+      <div class="fl-foot">
+        <div class="legend"><span><i class="lw"></i>آب</span><span><i class="lf"></i>مایع شست‌وشو و ضدعفونی (نمایش تصویری)</span><span><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg>هر آدمک = ۱٬۵۰۰ شیفت کاری ۸ ساعته</span></div>
+        <p class="fl-sum" data-sum></p><a class="hero-btn" href="tel:02192001017">مشاوره با کارشناس فروش</a><p class="note">* محاسبات بر اساس فرمول‌های محاسبه‌گر فعلی آبادیس</p>
+      </div>
     </div></div>
   </section>
 
@@ -210,25 +282,48 @@
     (() => {
       const A = Abadis, fa = A.fa;
       function setup(root, kind) {
-        const sea = root.querySelector('.sea'), sum = root.querySelector('[data-sum]'), hint = root.querySelector('[data-hint]');
+        const pin = root.querySelector('.calc-pin'), topEl = root.querySelector('.fl-top'), sea = root.querySelector('.sea');
+        const fluid = root.querySelector('.fluid'), flabel = root.querySelector('.flabel'), foot = root.querySelector('.fl-foot');
+        const figs = [...root.querySelectorAll('.fig')], per = +root.dataset.per;
+        const sum = root.querySelector('[data-sum]'), hint = root.querySelector('[data-hint]');
         const sub = {}; root.querySelectorAll('[data-sub]').forEach((e) => { sub[e.dataset.sub] = e; });
         const chA = root.querySelector('[data-ch="a"]'), chB = root.querySelector('[data-ch="b"]');
         return A.createCalc(root, kind, (s) => {
-          const f = kind === 'surgery' ? s.fr.input : s.fr.water;
+          const f = Math.min(1, kind === 'surgery' ? s.fr.input : s.fr.water);
           const mob = innerWidth <= 860;
-          const lo = mob ? 30 : 24, hi = mob ? 57 : 60;   // water height in % of screen
-          const level = lo + (hi - lo) * Math.min(1, f);
+          const pinH = pin.clientHeight || innerHeight, tb = topEl.offsetTop + topEl.offsetHeight;
+          const lo = mob ? 40 : 34, hi = mob ? 62 : 58;
+          const cap = Math.max(lo + 4, (pinH - tb - (mob ? 48 : 60)) / pinH * 100);
+          const level = lo + (Math.min(hi, cap) - lo) * f;
           sea.style.transform = 'translateY(' + (100 - level).toFixed(2) + '%)';
+          // washing-fluid layer: a fixed visual share of the water column that grows with the same scroll (no volume figure)
+          const col = pinH * level / 100, share = s.C > 0 ? 0.3 + 0.18 * f : 0, fh = col * share;
+          fluid.style.transform = 'translateY(' + (col - fh).toFixed(1) + 'px)';
+          const footUp = pinH - foot.offsetTop, lift = Math.max(0, footUp + 24 - fh);
+          flabel.style.transform = 'translate(-50%, calc(-50% - ' + lift.toFixed(1) + 'px))';
+          flabel.style.opacity = s.C > 0 ? '1' : '0';
+          // crew: one figure per `per` shifts, the last one fades in proportionally
+          // two rows of figures fitted between the surface tags and the fluid label
+          const figH = mob ? 40 : 58, bandTop = mob ? 74 : 86;
+          const bandBot = col - fh - lift - (mob ? 22 : 26) - figH;
+          const gap = Math.max(0, Math.min(mob ? 46 : 70, bandBot - bandTop));
+          const rowY = [bandTop, bandTop + gap];
+          const count = s.H / 8 / per;
+          figs.forEach((g, i) => {
+            const o = Math.max(0, Math.min(1, count - i));
+            g.style.opacity = o.toFixed(3); g.classList.toggle('on', o > 0);
+            g.style.top = rowY[+g.dataset.row] + 'px';
+          });
           sub.tubs.textContent = s.W > 0 ? '≈ ' + fa(s.W / 200) + ' وان ۲۰۰ لیتری (تقریبی)' : '';
-          sub.read.textContent = s.C >= 1e6 ? '≈ ' + A.readableToman(s.C) : '';
           sub.shifts.textContent = s.H > 0 ? '≈ ' + fa(s.H / 8) + ' شیفت کاری ۸ ساعته' : '';
+          const tail = ': <b>' + fa(s.W) + '</b> لیتر آب، <b>' + fa(s.C) + '</b> تومان هزینه شست‌وشو و ضدعفونی و <b>' + fa(s.H) + '</b> ساعت از زمان کادر درمان.';
           if (kind === 'surgery') {
-            sum.innerHTML = s.disp.n > 0 ? 'با <b>' + fa(s.disp.n) + '</b> عمل جراحی در سال: <b>' + fa(s.W) + '</b> لیتر آب، <b>' + fa(s.C) + '</b> تومان هزینه شست‌وشو و ضدعفونی و <b>' + fa(s.H) + '</b> ساعت از زمان کادر درمان.' : '';
+            sum.innerHTML = s.disp.n > 0 ? 'با <b>' + fa(s.disp.n) + '</b> عمل جراحی در سال' + tail : '';
           } else {
             chA.classList.toggle('idle', s.phase === 'b'); chB.classList.toggle('idle', s.phase === 'a');
             chA.classList.toggle('held', s.phase === 'b' || s.lockedA != null);
             hint.textContent = s.phase === 'a' ? (s.lockedA != null ? 'تخت اتاق عمل روی ' + fa(s.lockedA) + ' ثابت است' : 'مرحله ۱: با اسکرول، تعداد تخت اتاق عمل را تنظیم کنید') : 'مرحله ۲: با اسکرول، تعداد تخت ICU|CCU را تنظیم کنید';
-            sum.innerHTML = (s.disp.a + s.disp.b) > 0 ? 'با <b>' + fa(s.disp.a) + '</b> تخت اتاق عمل و <b>' + fa(s.disp.b) + '</b> تخت ICU|CCU: <b>' + fa(s.W) + '</b> لیتر آب، <b>' + fa(s.C) + '</b> تومان هزینه شست‌وشو و ضدعفونی و <b>' + fa(s.H) + '</b> ساعت از زمان کادر درمان.' : '';
+            sum.innerHTML = (s.disp.a + s.disp.b) > 0 ? 'با <b>' + fa(s.disp.a) + '</b> تخت اتاق عمل و <b>' + fa(s.disp.b) + '</b> تخت ICU|CCU' + tail : '';
           }
         });
       }
