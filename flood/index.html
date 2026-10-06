@@ -24,8 +24,9 @@
     [data-theme="dark"] .fl-sec { background: linear-gradient(180deg, #071d20 0%, #0a2427 60%); }
     #calc1 .calc-track { height: 430vh; }
     #calc2 .calc-track { height: 680vh; }
-    .calc-pin { padding: 0; --lav1: #c9bdfb; --lav2: #9d8cf0; --lav3: #7f6ee0; }
-    [data-theme="dark"] .calc-pin { --lav1: #8f7fe6; --lav2: #6a58c9; --lav3: #4a3c9e; }
+    .calc-pin { padding: 0; --lav: 176,156,246; --lavd: 112,88,214; --w0: #a6ecf0; --w1: #3cc0cc; --w2: #0e86a0; --w3: #07506b; }
+    [data-theme="dark"] .calc-pin { --lav: 150,128,236; --lavd: 92,70,190; --w0: #48b9c4; --w1: #148596; --w2: #0a5570; --w3: #052c3e; }
+    /* top block: input + cost headline */
     .fl-top { position: absolute; z-index: 1; top: 0; left: 0; right: 0; padding: 88px 24px 0; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 2px; }
     .fl-top h2 { font-size: 1rem; font-weight: 800; color: var(--muted); }
     .fl-inrow { display: flex; justify-content: center; align-items: baseline; gap: 22px; flex-wrap: wrap; }
@@ -38,7 +39,7 @@
     .fl-head { margin-top: 4px; display: flex; flex-direction: column; align-items: center; }
     .fl-head .lb { font-size: .86rem; font-weight: 800; color: var(--muted); }
     .fl-head .val { display: flex; align-items: baseline; gap: 10px; }
-    .fl-head .odo { font-size: clamp(2.6rem, 6.4vw, 5.2rem); color: var(--teal-dark); }
+    .fl-head .odo { font-size: clamp(2.6rem, 5.6vw, 4.5rem); color: var(--teal-dark); }
     [data-theme="dark"] .fl-head .odo { color: #e6f3f3; }
     .fl-head .u { font-size: 1.1rem; font-weight: 900; color: var(--teal); }
     [data-theme="dark"] .fl-head .u { color: #2ec4c6; }
@@ -47,30 +48,31 @@
     .fl-top .chip { background: transparent; }
     .fl-top .confirm { margin-top: 6px; }
 
-    .sea { position: absolute; z-index: 2; left: 0; right: 0; top: 0; bottom: 0; transform: translateY(70%); transition: transform .5s cubic-bezier(.2,.75,.25,1); will-change: transform; pointer-events: none; }
-    .waves { position: absolute; left: -100%; top: -38px; width: 200%; height: 40px; animation: drift 9s linear infinite; }
-    .waves.w2 { animation-duration: 6s; animation-direction: reverse; top: -30px; }
+    /* water */
+    .sea { position: absolute; z-index: 2; left: 0; right: 0; top: 0; height: 100%; transform: translateY(60%); transition: transform .5s cubic-bezier(.2,.75,.25,1); will-change: transform; pointer-events: none; }
+    .sea .body { position: absolute; inset: 0; background:
+      linear-gradient(180deg, rgba(255,255,255,.38) 0, rgba(255,255,255,0) 46px),
+      linear-gradient(180deg, var(--w0) 0%, var(--w1) 14%, var(--w2) 42%, var(--w3) 78%); }
+    .wv { position: absolute; left: -100%; width: 200%; height: 48px; animation: drift 14s linear infinite; }
+    .wv3 { top: -40px; opacity: .45; animation-duration: 21s; } .wv3 path { fill: var(--w0); }
+    .wv2 { top: -34px; opacity: .7; animation-duration: 11s; animation-direction: reverse; } .wv2 path { fill: var(--w0); }
+    .wv1 { top: -30px; } .wv1 .fill { fill: var(--w0); }
+    .wv1 .hl { fill: none; stroke: #fff; stroke-width: 2.2; stroke-opacity: .85; vector-effect: non-scaling-stroke; }
+    [data-theme="dark"] .wv1 .hl { stroke-opacity: .55; }
     @keyframes drift { to { transform: translateX(50%); } }
-    .sea .body { position: absolute; inset: 0; background: linear-gradient(180deg, #3fcbd0 0%, #149aa0 30%, #05686b 75%); }
-    [data-theme="dark"] .sea .body { background: linear-gradient(180deg, #1aa6ab 0%, #0b6f74 30%, #043d40 75%); }
-    .sea .body::before { content: ""; position: absolute; inset: 0; background: radial-gradient(40% 20% at 20% 18%, rgba(255,255,255,.16), transparent 70%), repeating-linear-gradient(180deg, rgba(255,255,255,.05) 0 2px, transparent 2px 22px); }
-    /* washing & disinfection fluid layer (visual share only) */
-    .fluid { position: absolute; left: 0; right: 0; top: 0; bottom: 0; transform: translateY(100%); transition: transform .5s cubic-bezier(.2,.75,.25,1); will-change: transform; }
-    .fluid .fbody { position: absolute; inset: 0; background: linear-gradient(180deg, var(--lav1) 0%, var(--lav2) 22%, var(--lav3) 70%); opacity: .93; }
-    .fluid .fbody::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 14% 12%, rgba(255,255,255,.55) 0 2.5px, transparent 3.5px), radial-gradient(circle at 31% 26%, rgba(255,255,255,.45) 0 1.8px, transparent 2.8px), radial-gradient(circle at 63% 9%, rgba(255,255,255,.5) 0 2.2px, transparent 3.2px), radial-gradient(circle at 82% 22%, rgba(255,255,255,.4) 0 1.6px, transparent 2.6px), radial-gradient(circle at 47% 34%, rgba(255,255,255,.35) 0 1.6px, transparent 2.6px), radial-gradient(60% 30% at 70% 0%, rgba(255,255,255,.22), transparent 70%); }
-    .fluid .waves { top: -14px; height: 16px; animation-duration: 7s; }
-    .fluid .fline { position: absolute; left: 0; right: 0; top: 0; height: 2px; background: rgba(255,255,255,.7); }
-    .flabel { position: absolute; left: 50%; top: 0; transform: translate(-50%, -50%); transition: transform .5s cubic-bezier(.2,.75,.25,1); z-index: 3; }
-    .flabel .tag { background: #f6f3ff; border-radius: 16px; padding: 5px 16px 3px; display: flex; align-items: center; gap: 8px; white-space: nowrap; box-shadow: 0 12px 26px rgba(60,40,140,.25), inset 0 -3px 0 rgba(127,110,224,.18); }
-    [data-theme="dark"] .flabel .tag { background: #241d4d; box-shadow: 0 12px 26px rgba(0,0,0,.4), inset 0 0 0 1px rgba(201,189,251,.35); }
-    .flabel .k { font-size: .74rem; font-weight: 800; color: #5b4bb8; }
-    [data-theme="dark"] .flabel .k { color: #cfc4ff; }
-    .flabel .odo { font-size: 1.35rem; color: #3b2d8f; }
-    [data-theme="dark"] .flabel .odo { color: #e6e0ff; }
-    .flabel .u { font-size: .74rem; font-weight: 800; color: #6c5fb0; }
-    [data-theme="dark"] .flabel .u { color: #cfc4ff; }
+    .glint { position: absolute; top: 2px; left: 0; width: 34%; height: 10px; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,255,255,.75), rgba(255,255,255,0)); animation: glint 7s ease-in-out infinite; }
+    .glint.g2 { top: 14px; width: 22%; height: 7px; animation-duration: 9.5s; animation-delay: -4s; opacity: .7; }
+    @keyframes glint { 0% { transform: translateX(-40%); opacity: 0; } 30%, 70% { opacity: 1; } 100% { transform: translateX(320%); opacity: 0; } }
+    .caus { position: absolute; inset: 0; overflow: hidden; -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 26px, rgba(0,0,0,.55) 40%, transparent 78%); mask-image: linear-gradient(180deg, transparent 0, #000 26px, rgba(0,0,0,.55) 40%, transparent 78%); }
+    .caus i { position: absolute; left: -256px; top: -256px; right: -256px; bottom: -256px; background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22256%22%20height%3D%22256%22%20viewBox%3D%220%200%20256%20256%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M50.0%2023.6C48.5%2029.3%2046.0%2037.9%2041.7%2041.7C37.4%2045.5%2030.0%2046.4%2024.3%2046.3C18.7%2046.2%209.9%2046.8%207.5%2041.1C5.1%2035.4%208.3%2019.3%2010.1%2012.1C11.9%204.9%2011.4%20-1.4%2018.1%20-2.2C24.9%20-3.0%2045.4%203.0%2050.7%207.3C56.0%2011.6%2051.5%2017.8%2050.0%2023.6Z%22%20stroke-width%3D%221.5%22%20stroke-opacity%3D%220.56%22/%3E%3Cpath%20d%3D%22M62.2%20279.3C63.7%20286.4%2059.8%20297.0%2053.7%20301.0C47.6%20305.1%2033.3%20304.4%2025.8%20303.6C18.2%20302.7%2011.2%20301.8%208.5%20295.9C5.8%20289.9%207.0%20275.1%209.4%20267.8C11.9%20260.5%2017.3%20253.9%2023.1%20252.2C29.0%20250.6%2038.0%20253.5%2044.5%20258.0C51.0%20262.5%2060.7%20272.1%2062.2%20279.3Z%22%20stroke-width%3D%221.5%22%20stroke-opacity%3D%220.56%22/%3E%3Cpath%20d%3D%22M305.5%2020.3C306.2%2027.2%20310.6%2040.5%20306.3%2045.4C302.0%2050.2%20287.5%2051.2%20279.8%2049.5C272.1%2047.9%20264.0%2041.5%20259.8%2035.6C255.7%2029.7%20251.4%2020.0%20255.0%2014.3C258.6%208.6%20273.6%202.9%20281.5%201.2C289.4%20-0.5%20298.6%200.8%20302.6%204.0C306.6%207.2%20304.9%2013.4%20305.5%2020.3Z%22%20stroke-width%3D%221.5%22%20stroke-opacity%3D%220.56%22/%3E%3Cpath%20d%3D%22M314.4%20286.7C314.9%20294.8%20313.4%20301.6%20308.2%20305.1C303.1%20308.5%20291.2%20310.2%20283.6%20307.3C276.0%20304.5%20265.9%20294.1%20262.8%20288.2C259.8%20282.3%20262.3%20278.2%20265.2%20271.9C268.1%20265.6%20273.4%20253.0%20280.1%20250.4C286.9%20247.8%20299.9%20250.4%20305.6%20256.4C311.3%20262.5%20314.0%20278.6%20314.4%20286.7Z%22%20stroke-width%3D%221.5%22%20stroke-opacity%3D%220.56%22/%3E%3Cpath%20d%3D%22M60.6%20105.4C61.8%20113.2%2052.1%20118.4%2046.7%20122.4C41.3%20126.4%2036.4%20131.2%2028.1%20129.5C19.9%20127.8%200.5%20119.4%20-2.8%20112.1C-6.1%20104.9%204.7%2092.8%208.5%2086.1C12.3%2079.4%2015.0%2073.6%2020.2%2071.9C25.3%2070.2%2032.7%2070.3%2039.4%2075.9C46.1%2081.5%2059.3%2097.7%2060.6%20105.4Z%22%20stroke-width%3D%222.6%22%20stroke-opacity%3D%220.53%22/%3E%3Cpath%20d%3D%22M305.9%2096.3C306.0%20103.0%20311.8%20114.4%20308.0%20119.0C304.2%20123.5%20291.9%20124.2%20283.4%20123.5C274.8%20122.9%20260.5%20120.2%20256.4%20115.2C252.3%20110.3%20255.2%20101.5%20258.7%2093.7C262.3%2085.9%20269.8%2071.1%20277.9%2068.6C286.1%2066.1%20303.1%2074.0%20307.7%2078.6C312.4%2083.2%20305.9%2089.5%20305.9%2096.3Z%22%20stroke-width%3D%222.6%22%20stroke-opacity%3D%220.53%22/%3E%3Cpath%20d%3D%22M48.3%20154.7C48.0%20160.2%2047.6%20168.5%2043.3%20173.3C38.9%20178.2%2027.2%20184.5%2022.0%20183.7C16.7%20182.9%2014.2%20174.3%2011.6%20168.5C8.9%20162.7%204.4%20155.7%206.1%20149.0C7.8%20142.4%2015.3%20129.9%2021.8%20128.4C28.3%20127.0%2040.6%20135.9%2045.0%20140.2C49.4%20144.6%2048.6%20149.1%2048.3%20154.7Z%22%20stroke-width%3D%223.2%22%20stroke-opacity%3D%220.73%22/%3E%3Cpath%20d%3D%22M310.6%20159.9C312.9%20166.2%20313.1%20172.6%20306.8%20176.9C300.6%20181.2%20280.7%20187.8%20273.1%20185.8C265.4%20183.9%20262.3%20171.2%20261.0%20165.3C259.6%20159.4%20261.7%20154.9%20265.0%20150.5C268.2%20146.1%20275.8%20140.8%20280.5%20138.9C285.2%20137.0%20288.0%20135.6%20293.0%20139.1C298.0%20142.6%20308.3%20153.6%20310.6%20159.9Z%22%20stroke-width%3D%223.2%22%20stroke-opacity%3D%220.73%22/%3E%3Cpath%20d%3D%22M45.7%20216.7C46.9%20222.3%2050.3%20233.3%2046.1%20237.0C41.8%20240.6%2026.5%20239.4%2020.1%20238.6C13.7%20237.8%209.8%20236.1%207.9%20232.0C5.9%20227.9%205.6%20220.5%208.3%20214.0C11.0%20207.5%2018.8%20195.0%2023.9%20193.2C28.9%20191.4%2035.1%20199.3%2038.8%20203.2C42.4%20207.2%2044.5%20211.0%2045.7%20216.7Z%22%20stroke-width%3D%221.4%22%20stroke-opacity%3D%220.41%22/%3E%3Cpath%20d%3D%22M298.9%20217.1C298.2%20223.0%20298.9%20231.8%20294.8%20235.3C290.6%20238.8%20279.9%20237.6%20274.2%20238.1C268.4%20238.5%20261.8%20242.3%20260.2%20238.1C258.6%20233.8%20261.8%20218.2%20264.7%20212.5C267.6%20206.8%20272.1%20206.1%20277.8%20203.9C283.4%20201.8%20295.2%20197.3%20298.7%20199.5C302.2%20201.7%20299.5%20211.1%20298.9%20217.1Z%22%20stroke-width%3D%221.4%22%20stroke-opacity%3D%220.41%22/%3E%3Cpath%20d%3D%22M127.5%2039.2C127.1%2045.3%20119.0%2050.9%20114.5%2055.0C110.1%2059.0%20107.4%2065.8%20100.9%2063.6C94.4%2061.4%2079.1%2048.9%2075.6%2041.7C72.2%2034.5%2076.1%2024.6%2080.3%2020.2C84.6%2015.7%2094.9%2015.4%20101.1%2015.1C107.3%2014.8%20113.0%2014.5%20117.4%2018.5C121.8%2022.5%20128.0%2033.2%20127.5%2039.2Z%22%20stroke-width%3D%222.1%22%20stroke-opacity%3D%220.42%22/%3E%3Cpath%20d%3D%22M109.6%2091.9C108.8%2099.1%20105.2%20111.0%2099.8%20113.5C94.3%20116.0%2081.8%20109.5%2076.7%20107.0C71.6%20104.4%2070.7%20102.7%2069.1%2098.2C67.4%2093.8%2064.6%2087.2%2066.7%2080.5C68.8%2073.8%2075.6%2059.6%2081.9%2058.0C88.2%2056.3%2099.9%2064.9%20104.5%2070.6C109.1%2076.2%20110.4%2084.8%20109.6%2091.9Z%22%20stroke-width%3D%221.9%22%20stroke-opacity%3D%220.63%22/%3E%3Cpath%20d%3D%22M124.2%20169.6C124.7%20174.7%20116.6%20178.2%20111.1%20180.8C105.7%20183.4%2098.0%20186.5%2091.6%20185.4C85.1%20184.3%2074.6%20178.8%2072.5%20174.2C70.5%20169.5%2074.8%20163.2%2079.2%20157.7C83.6%20152.1%2094.2%20142.2%2099.0%20140.9C103.8%20139.6%20103.9%20145.0%20108.1%20149.8C112.3%20154.6%20123.6%20164.4%20124.2%20169.6Z%22%20stroke-width%3D%222.7%22%20stroke-opacity%3D%220.71%22/%3E%3Cpath%20d%3D%22M119.1%20-16.5C119.4%20-10.2%20114.2%20-4.8%20109.0%20-2.3C103.9%200.1%2096.5%200.6%2088.1%20-1.9C79.8%20-4.4%2063.9%20-11.1%2058.9%20-17.4C53.8%20-23.6%2054.3%20-32.9%2057.9%20-39.4C61.5%20-46.0%2072.1%20-56.5%2080.4%20-56.7C88.6%20-56.9%20100.9%20-47.2%20107.4%20-40.5C113.8%20-33.8%20118.8%20-22.9%20119.1%20-16.5Z%22%20stroke-width%3D%221.7%22%20stroke-opacity%3D%220.68%22/%3E%3Cpath%20d%3D%22M114.7%20228.9C114.9%20237.0%20115.3%20247.8%20110.6%20252.9C105.8%20258.0%2094.4%20259.6%2086.2%20259.6C77.9%20259.5%2065.1%20258.8%2061.2%20252.5C57.4%20246.2%2059.2%20230.8%2062.8%20221.8C66.4%20212.7%2075.0%20201.2%2082.8%20198.3C90.6%20195.4%20104.2%20199.1%20109.5%20204.2C114.8%20209.3%20114.5%20220.8%20114.7%20228.9Z%22%20stroke-width%3D%221.7%22%20stroke-opacity%3D%220.68%22/%3E%3Cpath%20d%3D%22M179.8%2029.5C179.2%2035.6%20175.4%2046.5%20171.1%2051.8C166.8%2057.1%20159.4%2062.8%20153.9%2061.2C148.4%2059.6%20141.0%2049.2%20138.0%2042.5C135.0%2035.7%20132.4%2025.9%20135.8%2020.7C139.1%2015.5%20151.7%2012.3%20158.3%2011.4C164.8%2010.4%20171.4%2012.0%20175.0%2015.0C178.6%2018.0%20180.4%2023.3%20179.8%2029.5Z%22%20stroke-width%3D%221.4%22%20stroke-opacity%3D%220.53%22/%3E%3Cpath%20d%3D%22M189.7%20285.3C189.7%20292.2%20183.6%20304.4%20176.9%20309.9C170.1%20315.4%20156.0%20319.7%20149.1%20318.3C142.1%20316.9%20137.5%20308.3%20135.4%20301.4C133.2%20294.5%20132.6%20283.5%20136.2%20277.1C139.8%20270.7%20150.0%20264.5%20156.7%20263.1C163.5%20261.7%20171.1%20264.8%20176.6%20268.5C182.1%20272.2%20189.6%20278.4%20189.7%20285.3Z%22%20stroke-width%3D%221.4%22%20stroke-opacity%3D%220.53%22/%3E%3Cpath%20d%3D%22M204.5%20101.0C203.8%20109.3%20186.6%20116.6%20180.5%20121.2C174.4%20125.8%20173.1%20129.4%20167.8%20128.5C162.5%20127.6%20153.6%20121.8%20148.6%20115.8C143.6%20109.8%20135.1%20101.0%20137.9%2092.6C140.8%2084.1%20158.2%2068.6%20165.9%2065.1C173.7%2061.6%20178.0%2065.6%20184.4%2071.5C190.8%2077.5%20205.1%2092.8%20204.5%20101.0Z%22%20stroke-width%3D%223.3%22%20stroke-opacity%3D%220.45%22/%3E%3Cpath%20d%3D%22M190.4%20159.1C192.1%20168.4%20192.2%20178.4%20186.1%20181.2C180.0%20183.9%20162.0%20178.0%20153.8%20175.6C145.7%20173.2%20139.3%20171.9%20137.0%20166.6C134.6%20161.3%20137.1%20151.3%20139.8%20143.8C142.5%20136.4%20147.1%20125.0%20153.1%20121.9C159.1%20118.8%20169.6%20119.3%20175.9%20125.5C182.1%20131.7%20188.7%20149.8%20190.4%20159.1Z%22%20stroke-width%3D%223.3%22%20stroke-opacity%3D%220.44%22/%3E%3Cpath%20d%3D%22M188.6%20207.8C188.5%20214.6%20179.2%20235.8%20174.1%20240.6C169.1%20245.3%20164.4%20237.7%20158.2%20236.3C152.0%20234.8%20140.1%20236.7%20137.0%20232.0C133.9%20227.2%20137.3%20215.4%20139.7%20207.7C142.0%20200.0%20145.2%20187.1%20151.1%20185.8C157.0%20184.4%20168.7%20196.0%20175.0%20199.7C181.2%20203.3%20188.7%20201.0%20188.6%20207.8Z%22%20stroke-width%3D%222.6%22%20stroke-opacity%3D%220.55%22/%3E%3Cpath%20d%3D%22M245.5%2034.0C245.2%2040.5%20237.6%2051.1%20230.8%2056.5C224.0%2061.8%20210.5%2067.7%20204.8%2066.1C199.1%2064.5%20197.4%2053.0%20196.6%2046.7C195.8%2040.3%20196.7%2033.4%20199.9%2028.0C203.1%2022.6%20210.5%2016.0%20215.9%2014.3C221.3%2012.5%20227.4%2014.3%20232.3%2017.6C237.2%2020.9%20245.7%2027.5%20245.5%2034.0Z%22%20stroke-width%3D%222.8%22%20stroke-opacity%3D%220.39%22/%3E%3Cpath%20d%3D%22M-4.6%2087.6C-3.6%2092.2%20-4.5%2099.6%20-8.1%20103.6C-11.7%20107.7%20-20.3%20113.0%20-26.2%20112.0C-32.0%20111.0%20-40.6%20102.7%20-43.1%2097.8C-45.5%2093.0%20-43.3%2086.8%20-40.9%2082.9C-38.6%2079.1%20-33.1%2075.6%20-28.7%2074.5C-24.2%2073.4%20-18.3%2074.2%20-14.3%2076.3C-10.3%2078.5%20-5.6%2083.1%20-4.6%2087.6Z%22%20stroke-width%3D%222.5%22%20stroke-opacity%3D%220.45%22/%3E%3Cpath%20d%3D%22M255.9%2094.1C255.4%20100.1%20254.5%20104.4%20249.3%20106.7C244.0%20109.1%20230.9%20109.7%20224.6%20108.2C218.2%20106.7%20213.9%20102.4%20211.2%2097.7C208.5%2093.0%20205.9%2084.6%20208.4%2079.8C210.9%2075.1%20218.9%2070.7%20226.2%2069.2C233.5%2067.7%20247.3%2066.8%20252.2%2070.9C257.2%2075.1%20256.4%2088.1%20255.9%2094.1Z%22%20stroke-width%3D%222.5%22%20stroke-opacity%3D%220.45%22/%3E%3Cpath%20d%3D%22M-13.3%20165.0C-12.7%20171.0%20-13.4%20177.0%20-18.4%20181.1C-23.4%20185.2%20-37.6%20190.1%20-43.5%20189.8C-49.3%20189.5%20-50.2%20186.6%20-53.3%20179.5C-56.4%20172.5%20-64.4%20153.8%20-61.9%20147.5C-59.5%20141.3%20-45.2%20142.3%20-38.6%20141.9C-32.0%20141.5%20-26.4%20141.3%20-22.1%20145.2C-17.9%20149.0%20-13.9%20159.0%20-13.3%20165.0Z%22%20stroke-width%3D%222.7%22%20stroke-opacity%3D%220.51%22/%3E%3Cpath%20d%3D%22M244.1%20166.2C244.1%20173.1%20243.2%20180.3%20236.8%20185.5C230.4%20190.7%20212.1%20198.9%20205.8%20197.4C199.4%20196.0%20199.3%20184.5%20198.6%20176.7C197.8%20168.9%20198.5%20155.7%20201.2%20150.7C203.9%20145.6%20208.8%20147.5%20214.7%20146.4C220.6%20145.3%20231.8%20140.8%20236.7%20144.1C241.6%20147.4%20244.1%20159.3%20244.1%20166.2Z%22%20stroke-width%3D%222.7%22%20stroke-opacity%3D%220.51%22/%3E%3Cpath%20d%3D%22M-7.6%20212.9C-7.2%20218.3%20-11.6%20225.9%20-16.1%20230.5C-20.7%20235.1%20-28.1%20241.0%20-34.8%20240.6C-41.5%20240.3%20-52.9%20234.8%20-56.3%20228.5C-59.8%20222.2%20-59.1%20209.6%20-55.6%20202.7C-52.1%20195.8%20-41.8%20187.9%20-35.5%20187.2C-29.3%20186.5%20-22.7%20194.2%20-18.1%20198.5C-13.4%20202.8%20-7.9%20207.6%20-7.6%20212.9Z%22%20stroke-width%3D%221.4%22%20stroke-opacity%3D%220.46%22/%3E%3Cpath%20d%3D%22M245.2%20223.2C244.5%20231.1%20242.5%20237.5%20239.0%20241.7C235.5%20245.9%20231.1%20251.2%20224.2%20248.5C217.2%20245.7%20201.4%20232.7%20197.1%20225.0C192.9%20217.2%20195.9%20207.1%20198.6%20201.9C201.4%20196.6%20206.2%20194.9%20213.6%20193.7C221.0%20192.4%20237.8%20189.3%20243.1%20194.3C248.3%20199.2%20245.8%20215.3%20245.2%20223.2Z%22%20stroke-width%3D%221.4%22%20stroke-opacity%3D%220.46%22/%3E%3C/g%3E%3C/svg%3E"); background-size: 256px 256px; opacity: .3; animation: caus1 19s linear infinite; }
+    .caus i + i { background-size: 384px 384px; opacity: .17; animation: caus2 27s linear infinite; }
+    [data-theme="dark"] .caus i { opacity: .22; } [data-theme="dark"] .caus i + i { opacity: .14; }
+    @keyframes caus1 { to { transform: translate(256px, 256px); } }
+    @keyframes caus2 { to { transform: translate(-384px, 384px); } }
+    .bubbles span { position: absolute; border-radius: 50%; background: radial-gradient(circle at 32% 30%, rgba(255,255,255,.95) 0 18%, rgba(255,255,255,.18) 40%, rgba(255,255,255,.05) 70%); border: 1px solid rgba(255,255,255,.45); animation: rise 8s ease-in infinite; }
+    @keyframes rise { 0% { transform: translate(0, 60px); opacity: 0; } 15% { opacity: .9; } 50% { transform: translate(6px, -20px); } 100% { transform: translate(-4px, -140px); opacity: 0; } }
     /* surface tags */
-    .floats { position: absolute; left: 0; right: 0; top: -30px; display: flex; justify-content: center; align-items: flex-start; gap: 12vw; padding: 0 20px; z-index: 4; }
+    .floats { position: absolute; left: 0; right: 0; top: -30px; display: flex; justify-content: space-between; align-items: flex-start; padding: 0 9%; z-index: 4; }
     .buoy { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; animation: bob 4.2s ease-in-out infinite; }
     .buoy:nth-child(2) { animation-delay: -2.1s; }
     @keyframes bob { 50% { transform: translateY(5px) rotate(-1deg); } }
@@ -82,32 +84,54 @@
     .buoy .odo { font-size: 1.7rem; color: var(--ink); }
     [data-theme="dark"] .buoy .odo { color: #2ec4c6; }
     .buoy .u { font-size: .82rem; font-weight: 800; color: var(--muted); }
-    .buoy .cap { margin-top: 10px; font-size: .84rem; font-weight: 800; color: #fff; }
-    .buoy .eq { font-size: .76rem; color: rgba(255,255,255,.85); min-height: 1.3em; }
-    /* floating staff figures */
-    .crew { position: absolute; left: 0; right: 0; top: 0; height: 0; z-index: 2; }
-    .fig { position: absolute; width: 50px; height: 58px; margin-left: -25px; opacity: 0; transform: scale(.55); transition: opacity .4s, transform .45s cubic-bezier(.3,1.5,.5,1); }
-    .fig.on { transform: none; }
-    .fig svg { width: 100%; height: 100%; overflow: visible; animation: float 3.6s ease-in-out infinite; }
-    .fig:nth-child(2n) svg { animation-duration: 4.4s; animation-delay: -1.2s; }
-    .fig:nth-child(3n) svg { animation-duration: 3.1s; animation-delay: -2.2s; }
-    @keyframes float { 0%, 100% { transform: translate(0, 0) rotate(-3deg); } 50% { transform: translate(5px, 5px) rotate(3deg); } }
-    .f-body { fill: #05686b; } .f-head { fill: #0b4f52; } .f-cap { fill: #fff; } .f-cross { fill: #2ec4c6; }
-    .f-ring { fill: none; stroke: #fff; stroke-width: 6; } .f-ring2 { fill: none; stroke: #ff8f7e; stroke-width: 6; stroke-dasharray: 9 11; }
-    [data-theme="dark"] .f-body { fill: #2ec4c6; } [data-theme="dark"] .f-head { fill: #8fe3e4; } [data-theme="dark"] .f-cross { fill: #05686b; }
-    /* foot */
-    .fl-foot { position: absolute; z-index: 5; left: 0; right: 0; bottom: 18px; display: flex; flex-direction: column; align-items: center; gap: 7px; padding: 0 16px; text-align: center; }
-    .legend { display: flex; justify-content: center; align-items: center; gap: 6px 14px; flex-wrap: wrap; font-size: .74rem; font-weight: 700; color: #fff; background: rgba(4,40,42,.28); border-radius: 999px; padding: 4px 14px; }
+    .buoy .cap { margin-top: 10px; font-size: .84rem; font-weight: 800; color: #fff; text-shadow: 0 1px 2px rgba(0,40,50,.35); }
+    .buoy .eq { font-size: .76rem; color: rgba(255,255,255,.9); min-height: 1.3em; text-shadow: 0 1px 2px rgba(0,40,50,.35); }
+
+    /* washing & disinfection fluid: translucent denser layer settling in the lower water (visual share only) */
+    .fluid { position: absolute; z-index: 3; left: 0; right: 0; top: 0; height: 100%; transform: translateY(100%); transition: transform .5s cubic-bezier(.2,.75,.25,1), opacity .4s; will-change: transform; pointer-events: none; }
+    .fluid .fb { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(var(--lav),0) 0, rgba(var(--lav),.28) 46px, rgba(var(--lav),.6) 92px, rgba(var(--lavd),.78) 240px, rgba(var(--lavd),.86) 100%); }
+    .fluid .fb::after { content: ""; position: absolute; inset: 80px 0 0; background: radial-gradient(40% 60px at 25% 30px, rgba(255,255,255,.14), transparent), radial-gradient(30% 50px at 75% 70px, rgba(255,255,255,.1), transparent); }
+    .plume { position: absolute; width: 38%; height: 120px; border-radius: 50%; background: radial-gradient(closest-side, rgba(var(--lav),.7), rgba(var(--lav),.25) 55%, rgba(var(--lav),0)); animation: plume 9s ease-in-out infinite; }
+    @keyframes plume { 0% { transform: translate(0, 40px) scale(.7, .6); opacity: 0; } 35% { opacity: .9; } 100% { transform: translate(var(--px, 20px), -70px) scale(1.25, 1.1); opacity: 0; } }
+    .swirl { position: absolute; left: 0; width: 100%; top: 20px; height: 90px; overflow: visible; animation: swirl 16s ease-in-out infinite alternate; }
+    .swirl path { fill: none; stroke: rgba(var(--lav),.5); stroke-linecap: round; }
+    @keyframes swirl { to { transform: translateX(-4%); } }
+    .fshim { position: absolute; left: 0; right: 0; top: 76px; height: 3px; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 15%, #000 85%, transparent); mask-image: linear-gradient(90deg, transparent, #000 15%, #000 85%, transparent); }
+    .fshim::after { content: ""; position: absolute; top: 0; left: 0; width: 30%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,.75), transparent); animation: shim 6s linear infinite; }
+    @keyframes shim { from { transform: translateX(-100%); } to { transform: translateX(400%); } }
+    .flabel { position: absolute; top: 78px; right: 5%; transform: translateY(-50%); }
+    .flabel .tag { background: #f6f3ff; border-radius: 16px; padding: 5px 16px 3px; display: flex; align-items: center; gap: 8px; white-space: nowrap; box-shadow: 0 12px 26px rgba(60,40,140,.25), inset 0 -3px 0 rgba(127,110,224,.18); }
+    [data-theme="dark"] .flabel .tag { background: #241d4d; box-shadow: 0 12px 26px rgba(0,0,0,.4), inset 0 0 0 1px rgba(201,189,251,.35); }
+    .flabel .k { font-size: .74rem; font-weight: 800; color: #5b4bb8; }
+    [data-theme="dark"] .flabel .k { color: #cfc4ff; }
+    .flabel .v { display: flex; align-items: baseline; gap: 6px; }
+    .flabel .odo { font-size: 1.35rem; color: #3b2d8f; }
+    [data-theme="dark"] .flabel .odo { color: #e6e0ff; }
+    .flabel .u { font-size: .74rem; font-weight: 800; color: #6c5fb0; }
+    [data-theme="dark"] .flabel .u { color: #cfc4ff; }
+
+    /* staff: sink and stack on the tank floor */
+    .pile { position: absolute; z-index: 4; left: 22%; bottom: 0; width: 0; height: 0; pointer-events: none; }
+    .fig { position: absolute; left: 0; bottom: 0; width: 38px; height: 95px; opacity: 0; transform-origin: 50% 90%;
+      transition: transform .9s cubic-bezier(.5,0,.85,.6), opacity .8s ease-in; }
+    .fig.on { opacity: 1; transition: transform 2.3s cubic-bezier(.18,.62,.28,1), opacity .5s; }
+    .fig svg { width: 100%; height: 100%; display: block; overflow: visible; animation: sway 5s ease-in-out infinite; transform-origin: 50% 95%; }
+    .fig:nth-child(2n) svg { animation-duration: 6.2s; animation-delay: -2s; }
+    @keyframes sway { 50% { transform: rotate(1.6deg); } }
+    /* base (tank floor) with legend + CTA */
+    .base { position: absolute; z-index: 6; left: 0; right: 0; bottom: 0; padding: 12px 16px 14px; display: flex; flex-direction: column; align-items: center; gap: 7px; text-align: center;
+      background: linear-gradient(180deg, #0f3d42 0%, #0a2b2e 100%); border-top: 3px solid rgba(110,220,226,.35); box-shadow: 0 -10px 24px rgba(3,30,34,.25); }
+    [data-theme="dark"] .base { background: linear-gradient(180deg, #0a2629 0%, #051517 100%); border-top-color: rgba(46,196,198,.28); }
+    .legend { display: flex; justify-content: center; align-items: center; gap: 4px 16px; flex-wrap: wrap; font-size: .74rem; font-weight: 700; color: #d4e7e8; }
     .legend span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
-    .legend i { width: 12px; height: 12px; border-radius: 4px; display: inline-block; }
-    .legend .lw { background: linear-gradient(#3fcbd0, #05686b); border: 1px solid rgba(255,255,255,.6); }
-    .legend .lf { background: linear-gradient(var(--lav1), var(--lav3)); border: 1px solid rgba(255,255,255,.6); }
-    .legend svg { width: 14px; height: 16px; }
-    .fl-sum { font-size: .8rem; color: #fff; max-width: 760px; line-height: 1.7; text-shadow: 0 1px 2px rgba(0,0,0,.25); }
-    .fl-sum b { font-weight: 900; color: #e9fdfd; }
-    .fl-foot .hero-btn { background: #fff; color: #05686b; box-shadow: 0 10px 30px rgba(0,0,0,.18); padding: 11px 22px; font-size: .86rem; }
-    [data-theme="dark"] .fl-foot .hero-btn { background: #2ec4c6; color: #072326; }
-    .fl-foot .note { font-size: .68rem; color: rgba(255,255,255,.8); }
+    .legend i { width: 12px; height: 12px; border-radius: 4px; display: inline-block; border: 1px solid rgba(255,255,255,.55); }
+    .legend .lw { background: linear-gradient(#a6ecf0, #0e86a0); }
+    .legend .lf { background: linear-gradient(rgb(176,156,246), rgb(112,88,214)); }
+    .legend svg { width: 10px; height: 25px; }
+    .fl-sum { font-size: .8rem; color: #d4e7e8; max-width: 780px; line-height: 1.7; }
+    .fl-sum b { font-weight: 900; color: #fff; }
+    .base .hero-btn { padding: 10px 22px; font-size: .86rem; }
+    .base .note { font-size: .68rem; color: #8fb3b5; }
     @media (max-width: 860px) {
       .fl-top { padding: 66px 10px 0; }
       .fl-top h2 { font-size: .8rem; }
@@ -119,40 +143,66 @@
       .fl-head .odo { font-size: 2.05rem; }
       .fl-head .u { font-size: .8rem; }
       .fl-hint { font-size: .64rem; }
-      .floats { gap: 10px; padding: 0 10px; top: -36px; justify-content: space-between; }
+      .floats { padding: 0 10px; top: -36px; }
       .buoy .tag { flex-direction: column; gap: 0; padding: 5px 12px 3px; border-radius: 14px; }
       .buoy .tag i { display: none; }
       .buoy .odo { font-size: 1.1rem; }
       .buoy .u { font-size: .6rem; }
       .buoy .cap { margin-top: 6px; font-size: .64rem; }
       .buoy .eq { font-size: .58rem; }
-      .fig { width: 34px; height: 40px; margin-left: -17px; }
-      .flabel .tag { padding: 4px 12px 2px; gap: 6px; }
-      .flabel .k { font-size: .6rem; }
+      .flabel { right: 3%; }
+      .flabel .tag { flex-direction: column; align-items: center; gap: 0; padding: 4px 12px 2px; border-radius: 13px; }
+      .flabel .k { font-size: .58rem; }
       .flabel .odo { font-size: 1rem; }
-      .flabel .u { font-size: .6rem; }
-      .fl-foot { bottom: 12px; gap: 5px; }
-      .legend { font-size: .58rem; gap: 3px 10px; padding: 3px 10px; }
+      .flabel .u { font-size: .58rem; }
+      .pile { left: 4%; }
+      .fig { width: 30px; height: 75px; }
+      .base { padding: 8px 10px 10px; gap: 5px; }
+      .legend { font-size: .6rem; gap: 2px 10px; }
       .legend i { width: 10px; height: 10px; }
       .fl-sum { display: none; }
-      .fl-foot .hero-btn { padding: 9px 18px; font-size: .78rem; }
-      .fl-foot .note { font-size: .58rem; }
+      .base .hero-btn { padding: 8px 18px; font-size: .78rem; }
+      .base .note { font-size: .58rem; }
     }
-    @media (prefers-reduced-motion: reduce) { .sea, .fluid, .flabel, .fig { transition: none; } }
+    @media (max-width: 860px) and (max-height: 760px) { .fig { width: 24px; height: 60px; } }
+    @media (prefers-reduced-motion: reduce) { .sea, .fluid, .fig, .fig.on { transition: none; } }
 
   </style>
 </head>
 <body>
-  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
-    <symbol id="i-crew" viewBox="0 0 50 58">
-      <path class="f-body" d="M8 30 Q4 18 10 14 Q12 22 17 26 L33 26 Q38 22 40 14 Q46 18 42 30 L38 44 L12 44 Z"/>
-      <circle class="f-head" cx="25" cy="15" r="8.5"/>
-      <path class="f-cap" d="M16.5 11.5 Q25 3 33.5 11.5 L33 13 L17 13 Z"/>
-      <path class="f-cross" d="M24 6.6h2v1.6h1.6v2H26v1.6h-2V10.2h-1.6v-2H24z"/>
-      <ellipse class="f-ring" cx="25" cy="43" rx="19" ry="7"/>
-      <ellipse class="f-ring2" cx="25" cy="43" rx="19" ry="7"/>
-    </symbol>
-  </defs></svg>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="st-a" viewBox="0 0 40 100">
+      <linearGradient id="tg-a" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3fb3c4"/><stop offset=".55" stop-color="#2a98ab"/><stop offset="1" stop-color="#1c7889"/></linearGradient>
+      <linearGradient id="pg-a" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1f8597"/><stop offset="1" stop-color="#166474"/></linearGradient>
+      <ellipse cx="14" cy="96.6" rx="5.2" ry="2.6" fill="#e9eff1"/><ellipse cx="26" cy="96.6" rx="5.2" ry="2.6" fill="#dfe7ea"/>
+      <path d="M12 58 L11.2 95 L17.4 95 L19.6 63 L20.4 63 L22.6 95 L28.8 95 L28 58 Z" fill="url(#pg-a)"/>
+      <path d="M19.6 64 L20 94" stroke="rgba(0,0,0,.18)" stroke-width=".8"/>
+      <path d="M6 42 L6.6 56 Q7.8 59.6 9.4 56 L10.4 43 Z" fill="#d8ac8a"/><path d="M34 42 L33.4 56 Q32.2 59.6 30.6 56 L29.6 43 Z" fill="#c99a78"/>
+      <path d="M10 30 Q20 26.4 30 30 L31 60 Q20 62.4 9 60 Z" fill="url(#tg-a)"/>
+      <path d="M10 30 Q5.6 32 5.6 42.6 L10.6 43.6 Z" fill="#3fb3c4"/><path d="M30 30 Q34.4 32 34.4 42.6 L29.4 43.6 Z" fill="#1c7889"/>
+      <path d="M16.2 28.6 L20 35 L23.8 28.6 Z" fill="#c99a78"/>
+      <rect x="22.4" y="37" width="5" height="4" rx="1" fill="none" stroke="rgba(255,255,255,.4)" stroke-width=".8"/>
+      <rect x="17.6" y="22" width="4.8" height="7.4" rx="1.4" fill="#c99a78"/>
+      <ellipse cx="20" cy="15" rx="7" ry="8" fill="#e2b896"/><ellipse cx="22.6" cy="16" rx="4.4" ry="7" fill="rgba(0,0,0,.07)"/>
+      <path d="M14.2 16.6 Q20 15.4 25.8 16.6 L25 21.2 Q20 24 15 21.2 Z" fill="#d6eef4"/><path d="M14.2 17.4 L12.8 15.4 M25.8 17.4 L27.2 15.4" stroke="#b9dbe4" stroke-width=".8"/>
+      <path d="M12.6 13.6 Q12.8 5 20 5 Q27.2 5 27.4 13.6 Q20 11 12.6 13.6 Z" fill="#1a6f80"/><path d="M14 9.4 Q20 7.2 26 9.4" stroke="rgba(255,255,255,.35)" stroke-width=".8" fill="none"/>
+      <path d="M16.4 29 Q13.6 40 19 45" fill="none" stroke="#33475b" stroke-width="1.2"/><path d="M23.6 29 Q25.4 38 21.5 43" fill="none" stroke="#33475b" stroke-width="1.2"/><circle cx="19.4" cy="45.6" r="1.8" fill="#5d6f80"/>
+    </symbol><symbol id="st-b" viewBox="0 0 40 100">
+      <linearGradient id="tg-b" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5a8fd6"/><stop offset=".55" stop-color="#447bc4"/><stop offset="1" stop-color="#2f5ea0"/></linearGradient>
+      <linearGradient id="pg-b" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3a6fb6"/><stop offset="1" stop-color="#2a5390"/></linearGradient>
+      <ellipse cx="14" cy="96.6" rx="5.2" ry="2.6" fill="#e9eff1"/><ellipse cx="26" cy="96.6" rx="5.2" ry="2.6" fill="#dfe7ea"/>
+      <path d="M12 58 L11.2 95 L17.4 95 L19.6 63 L20.4 63 L22.6 95 L28.8 95 L28 58 Z" fill="url(#pg-b)"/>
+      <path d="M19.6 64 L20 94" stroke="rgba(0,0,0,.18)" stroke-width=".8"/>
+      <path d="M6 42 L6.6 56 Q7.8 59.6 9.4 56 L10.4 43 Z" fill="#d8ac8a"/><path d="M34 42 L33.4 56 Q32.2 59.6 30.6 56 L29.6 43 Z" fill="#c99a78"/>
+      <path d="M10 30 Q20 26.4 30 30 L31 60 Q20 62.4 9 60 Z" fill="url(#tg-b)"/>
+      <path d="M10 30 Q5.6 32 5.6 42.6 L10.6 43.6 Z" fill="#5a8fd6"/><path d="M30 30 Q34.4 32 34.4 42.6 L29.4 43.6 Z" fill="#2f5ea0"/>
+      <path d="M16.2 28.6 L20 35 L23.8 28.6 Z" fill="#c99a78"/>
+      <rect x="22.4" y="37" width="5" height="4" rx="1" fill="none" stroke="rgba(255,255,255,.4)" stroke-width=".8"/>
+      <rect x="17.6" y="22" width="4.8" height="7.4" rx="1.4" fill="#c99a78"/>
+      <ellipse cx="20" cy="15" rx="7" ry="8" fill="#e2b896"/><ellipse cx="22.6" cy="16" rx="4.4" ry="7" fill="rgba(0,0,0,.07)"/>
+      <path d="M14.2 16.6 Q20 15.4 25.8 16.6 L25 21.2 Q20 24 15 21.2 Z" fill="#d6eef4"/><path d="M14.2 17.4 L12.8 15.4 M25.8 17.4 L27.2 15.4" stroke="#b9dbe4" stroke-width=".8"/>
+      <path d="M12.6 13.6 Q12.8 5 20 5 Q27.2 5 27.4 13.6 Q20 11 12.6 13.6 Z" fill="#2b5b9a"/><path d="M14 9.4 Q20 7.2 26 9.4" stroke="rgba(255,255,255,.35)" stroke-width=".8" fill="none"/>
+      
+    </symbol></defs></svg>
   <header class="header" id="header">
     <a class="logo" href="#top">آبادیس<span>مخازن طبی</span></a>
     <nav class="nav">
@@ -172,7 +222,7 @@
   <section class="intro" id="top">
     <div class="eyebrow">ابزار محاسبه · طرح سیلاب</div>
     <h1>صرفه‌جویی که <em>بالا می‌آید</em></h1>
-    <p>اسکرول کنید؛ آب و مایع شست‌وشوی صرفه‌جویی‌شده بالا می‌آیند و کادر درمانِ آزادشده روی آب شناور می‌شود.</p>
+    <p>اسکرول کنید؛ آب و مایع شست‌وشوی صرفه‌جویی‌شده بالا می‌آیند و کادر درمانِ آزادشده، کف مخزن روی هم جمع می‌شود.</p>
   </section>
 
   <section class="calc fl-sec" id="calc1" aria-labelledby="calc1-t" data-per="200">
@@ -187,20 +237,25 @@
               <button class="chip" type="button" data-n="30000">۳۰٬۰۰۰</button>
             </div></div>
       <div class="sea">
-        <svg class="waves" viewBox="0 0 2880 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 22 C120 6 240 6 360 20 S600 36 720 22 S960 6 1080 20 S1320 36 1440 22 C1560 6 1680 6 1800 20 S2040 36 2160 22 S2400 6 2520 20 S2760 36 2880 22 V40 H0 Z" fill="#7fe3f0" opacity=".5"/></svg>
-        <svg class="waves w2" viewBox="0 0 2880 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 22 C160 8 280 10 400 22 S640 34 780 22 S1040 8 1180 20 S1360 32 1440 22 C1600 8 1720 10 1840 22 S2080 34 2220 22 S2480 8 2620 20 S2800 32 2880 22 V40 H0 Z" fill="#3fcbd0"/></svg>
         <div class="body"></div>
-        <div class="fluid"><svg class="waves" viewBox="0 0 2880 16" preserveAspectRatio="none" aria-hidden="true"><path d="M0 9 C180 2 300 2 480 9 S780 16 960 9 S1260 2 1440 9 C1620 2 1740 2 1920 9 S2220 16 2400 9 S2700 2 2880 9 V16 H0 Z" fill="var(--lav1)"/></svg><div class="fbody"></div><span class="fline"></span>
-          <div class="flabel"><div class="tag"><span class="k">هزینه شست‌وشو و ضدعفونی</span><span class="odo" data-odo="cost" data-digits="13"></span><span class="u">تومان</span></div></div>
-        </div>
-        <div class="crew" aria-hidden="true"><span class="fig" data-row="0" style="left:50%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span><span class="fig" data-row="1" style="left:24%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span><span class="fig" data-row="1" style="left:76%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span><span class="fig" data-row="0" style="left:12%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span><span class="fig" data-row="0" style="left:88%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span><span class="fig" data-row="1" style="left:38%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span><span class="fig" data-row="1" style="left:62%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span><span class="fig" data-row="0" style="left:30%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span><span class="fig" data-row="0" style="left:70%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span></div>
+        <div class="caus" aria-hidden="true"><i></i><i></i></div>
+        <div class="bubbles" aria-hidden="true"><span style="width:10px;height:10px;left:9%;top:46%;animation-duration:9s;animation-delay:-1s"></span><span style="width:5px;height:5px;left:14%;top:38%;animation-duration:7s;animation-delay:-3s"></span><span style="width:7px;height:7px;left:31%;top:58%;animation-duration:11s;animation-delay:-6s"></span><span style="width:4px;height:4px;left:44%;top:34%;animation-duration:6s;animation-delay:-2s"></span><span style="width:12px;height:12px;left:57%;top:64%;animation-duration:10s;animation-delay:-4s"></span><span style="width:6px;height:6px;left:69%;top:42%;animation-duration:8s;animation-delay:-5s"></span><span style="width:4px;height:4px;left:81%;top:52%;animation-duration:7s;animation-delay:-1s"></span><span style="width:9px;height:9px;left:90%;top:36%;animation-duration:9s;animation-delay:-7s"></span></div>
+        <svg class="wv wv3" viewBox="0 0 2880 48" preserveAspectRatio="none" aria-hidden="true"><path d="M0 26.0 L16 26.1 L32 25.4 L48 23.9 L64 22.1 L80 20.6 L96 19.9 L112 20.2 L128 21.0 L144 21.9 L160 22.3 L176 21.9 L192 20.9 L208 19.7 L224 18.9 L240 18.9 L256 19.5 L272 20.5 L288 21.2 L304 21.6 L320 21.7 L336 22.0 L352 22.7 L368 24.2 L384 25.9 L400 27.5 L416 28.1 L432 27.5 L448 25.7 L464 23.2 L480 20.8 L496 19.0 L512 18.1 L528 17.8 L544 17.8 L560 17.7 L576 17.6 L592 17.7 L608 18.4 L624 20.0 L640 22.3 L656 24.7 L672 26.5 L688 27.2 L704 26.8 L720 25.4 L736 23.9 L752 22.8 L768 22.4 L784 22.5 L800 22.7 L816 22.5 L832 21.8 L848 20.9 L864 20.0 L880 19.7 L896 20.1 L912 20.8 L928 21.5 L944 21.5 L960 20.8 L976 19.8 L992 18.8 L1008 18.6 L1024 19.5 L1040 21.3 L1056 23.5 L1072 25.3 L1088 26.3 L1104 26.5 L1120 26.1 L1136 25.6 L1152 25.2 L1168 24.9 L1184 24.4 L1200 23.2 L1216 21.4 L1232 19.0 L1248 16.8 L1264 15.4 L1280 15.3 L1296 16.5 L1312 18.6 L1328 20.8 L1344 22.5 L1360 23.5 L1376 24.0 L1392 24.3 L1408 24.7 L1424 25.4 L1440 26.0 L1456 26.1 L1472 25.4 L1488 23.9 L1504 22.1 L1520 20.6 L1536 19.9 L1552 20.2 L1568 21.0 L1584 21.9 L1600 22.3 L1616 21.9 L1632 20.9 L1648 19.7 L1664 18.9 L1680 18.9 L1696 19.5 L1712 20.5 L1728 21.2 L1744 21.6 L1760 21.7 L1776 22.0 L1792 22.7 L1808 24.2 L1824 25.9 L1840 27.5 L1856 28.1 L1872 27.5 L1888 25.7 L1904 23.2 L1920 20.8 L1936 19.0 L1952 18.1 L1968 17.8 L1984 17.8 L2000 17.7 L2016 17.6 L2032 17.7 L2048 18.4 L2064 20.0 L2080 22.3 L2096 24.7 L2112 26.5 L2128 27.2 L2144 26.8 L2160 25.4 L2176 23.9 L2192 22.8 L2208 22.4 L2224 22.5 L2240 22.7 L2256 22.5 L2272 21.8 L2288 20.9 L2304 20.0 L2320 19.7 L2336 20.1 L2352 20.8 L2368 21.5 L2384 21.5 L2400 20.8 L2416 19.8 L2432 18.8 L2448 18.6 L2464 19.5 L2480 21.3 L2496 23.5 L2512 25.3 L2528 26.3 L2544 26.5 L2560 26.1 L2576 25.6 L2592 25.2 L2608 24.9 L2624 24.4 L2640 23.2 L2656 21.4 L2672 19.0 L2688 16.8 L2704 15.4 L2720 15.3 L2736 16.5 L2752 18.6 L2768 20.8 L2784 22.5 L2800 23.5 L2816 24.0 L2832 24.3 L2848 24.7 L2864 25.4 L2880 26.0 V48 H0 Z"/></svg>
+        <svg class="wv wv2" viewBox="0 0 2880 48" preserveAspectRatio="none" aria-hidden="true"><path d="M0 31.5 L16 32.1 L32 31.2 L48 29.3 L64 27.5 L80 26.0 L96 25.0 L112 23.8 L128 22.3 L144 20.6 L160 19.5 L176 19.7 L192 21.3 L208 23.6 L224 25.5 L240 26.1 L256 25.6 L272 24.5 L288 23.8 L304 23.9 L320 24.7 L336 25.6 L352 26.0 L368 26.3 L384 27.0 L400 28.4 L416 30.6 L432 32.8 L448 33.7 L464 33.1 L480 31.0 L496 28.4 L512 26.3 L528 25.3 L544 24.9 L560 24.6 L576 24.0 L592 23.3 L608 22.9 L624 23.4 L640 24.5 L656 25.5 L672 25.5 L688 24.2 L704 22.2 L720 20.5 L736 19.9 L752 20.8 L768 22.7 L784 24.5 L800 26.0 L816 27.0 L832 28.2 L848 29.7 L864 31.4 L880 32.5 L896 32.3 L912 30.7 L928 28.4 L944 26.5 L960 25.9 L976 26.4 L992 27.5 L1008 28.2 L1024 28.1 L1040 27.3 L1056 26.4 L1072 26.0 L1088 25.7 L1104 25.0 L1120 23.6 L1136 21.4 L1152 19.2 L1168 18.3 L1184 18.9 L1200 21.0 L1216 23.6 L1232 25.7 L1248 26.7 L1264 27.1 L1280 27.4 L1296 28.0 L1312 28.7 L1328 29.1 L1344 28.6 L1360 27.5 L1376 26.5 L1392 26.5 L1408 27.8 L1424 29.8 L1440 31.5 L1456 32.1 L1472 31.2 L1488 29.3 L1504 27.5 L1520 26.0 L1536 25.0 L1552 23.8 L1568 22.3 L1584 20.6 L1600 19.5 L1616 19.7 L1632 21.3 L1648 23.6 L1664 25.5 L1680 26.1 L1696 25.6 L1712 24.5 L1728 23.8 L1744 23.9 L1760 24.7 L1776 25.6 L1792 26.0 L1808 26.3 L1824 27.0 L1840 28.4 L1856 30.6 L1872 32.8 L1888 33.7 L1904 33.1 L1920 31.0 L1936 28.4 L1952 26.3 L1968 25.3 L1984 24.9 L2000 24.6 L2016 24.0 L2032 23.3 L2048 22.9 L2064 23.4 L2080 24.5 L2096 25.5 L2112 25.5 L2128 24.2 L2144 22.2 L2160 20.5 L2176 19.9 L2192 20.8 L2208 22.7 L2224 24.5 L2240 26.0 L2256 27.0 L2272 28.2 L2288 29.7 L2304 31.4 L2320 32.5 L2336 32.3 L2352 30.7 L2368 28.4 L2384 26.5 L2400 25.9 L2416 26.4 L2432 27.5 L2448 28.2 L2464 28.1 L2480 27.3 L2496 26.4 L2512 26.0 L2528 25.7 L2544 25.0 L2560 23.6 L2576 21.4 L2592 19.2 L2608 18.3 L2624 18.9 L2640 21.0 L2656 23.6 L2672 25.7 L2688 26.7 L2704 27.1 L2720 27.4 L2736 28.0 L2752 28.7 L2768 29.1 L2784 28.6 L2800 27.5 L2816 26.5 L2832 26.5 L2848 27.8 L2864 29.8 L2880 31.5 V48 H0 Z"/></svg>
+        <svg class="wv wv1" viewBox="0 0 2880 48" preserveAspectRatio="none" aria-hidden="true"><path class="fill" d="M0 35.5 L16 35.0 L32 34.0 L48 33.0 L64 32.4 L80 32.2 L96 32.5 L112 33.0 L128 33.5 L144 33.6 L160 33.4 L176 33.0 L192 32.7 L208 32.7 L224 33.2 L240 34.1 L256 35.2 L272 36.0 L288 36.0 L304 35.2 L320 33.4 L336 30.9 L352 28.2 L368 25.8 L384 24.2 L400 23.4 L416 23.3 L432 23.8 L448 24.4 L464 24.9 L480 25.1 L496 25.1 L512 25.1 L528 25.5 L544 26.2 L560 27.4 L576 28.7 L592 29.8 L608 30.4 L624 30.2 L640 29.3 L656 28.0 L672 26.8 L688 26.1 L704 26.3 L720 27.4 L736 29.3 L752 31.5 L768 33.6 L784 35.2 L800 36.2 L816 36.5 L832 36.5 L848 36.4 L864 36.4 L880 36.5 L896 36.7 L912 36.5 L928 35.9 L944 34.5 L960 32.7 L976 30.5 L992 28.5 L1008 27.2 L1024 26.7 L1040 27.1 L1056 28.2 L1072 29.5 L1088 30.5 L1104 31.0 L1120 30.6 L1136 29.6 L1152 28.2 L1168 26.8 L1184 25.8 L1200 25.2 L1216 25.0 L1232 24.9 L1248 24.7 L1264 24.3 L1280 23.7 L1296 23.1 L1312 22.9 L1328 23.4 L1344 24.7 L1360 26.8 L1376 29.4 L1392 32.0 L1408 34.1 L1424 35.3 L1440 35.5 L1456 35.0 L1472 34.0 L1488 33.0 L1504 32.4 L1520 32.2 L1536 32.5 L1552 33.0 L1568 33.5 L1584 33.6 L1600 33.4 L1616 33.0 L1632 32.7 L1648 32.7 L1664 33.2 L1680 34.1 L1696 35.2 L1712 36.0 L1728 36.0 L1744 35.2 L1760 33.4 L1776 30.9 L1792 28.2 L1808 25.8 L1824 24.2 L1840 23.4 L1856 23.3 L1872 23.8 L1888 24.4 L1904 24.9 L1920 25.1 L1936 25.1 L1952 25.1 L1968 25.5 L1984 26.2 L2000 27.4 L2016 28.7 L2032 29.8 L2048 30.4 L2064 30.2 L2080 29.3 L2096 28.0 L2112 26.8 L2128 26.1 L2144 26.3 L2160 27.4 L2176 29.3 L2192 31.5 L2208 33.6 L2224 35.2 L2240 36.2 L2256 36.5 L2272 36.5 L2288 36.4 L2304 36.4 L2320 36.5 L2336 36.7 L2352 36.5 L2368 35.9 L2384 34.5 L2400 32.7 L2416 30.5 L2432 28.5 L2448 27.2 L2464 26.7 L2480 27.1 L2496 28.2 L2512 29.5 L2528 30.5 L2544 31.0 L2560 30.6 L2576 29.6 L2592 28.2 L2608 26.8 L2624 25.8 L2640 25.2 L2656 25.0 L2672 24.9 L2688 24.7 L2704 24.3 L2720 23.7 L2736 23.1 L2752 22.9 L2768 23.4 L2784 24.7 L2800 26.8 L2816 29.4 L2832 32.0 L2848 34.1 L2864 35.3 L2880 35.5 V48 H0 Z"/><path class="hl" d="M0 35.5 L16 35.0 L32 34.0 L48 33.0 L64 32.4 L80 32.2 L96 32.5 L112 33.0 L128 33.5 L144 33.6 L160 33.4 L176 33.0 L192 32.7 L208 32.7 L224 33.2 L240 34.1 L256 35.2 L272 36.0 L288 36.0 L304 35.2 L320 33.4 L336 30.9 L352 28.2 L368 25.8 L384 24.2 L400 23.4 L416 23.3 L432 23.8 L448 24.4 L464 24.9 L480 25.1 L496 25.1 L512 25.1 L528 25.5 L544 26.2 L560 27.4 L576 28.7 L592 29.8 L608 30.4 L624 30.2 L640 29.3 L656 28.0 L672 26.8 L688 26.1 L704 26.3 L720 27.4 L736 29.3 L752 31.5 L768 33.6 L784 35.2 L800 36.2 L816 36.5 L832 36.5 L848 36.4 L864 36.4 L880 36.5 L896 36.7 L912 36.5 L928 35.9 L944 34.5 L960 32.7 L976 30.5 L992 28.5 L1008 27.2 L1024 26.7 L1040 27.1 L1056 28.2 L1072 29.5 L1088 30.5 L1104 31.0 L1120 30.6 L1136 29.6 L1152 28.2 L1168 26.8 L1184 25.8 L1200 25.2 L1216 25.0 L1232 24.9 L1248 24.7 L1264 24.3 L1280 23.7 L1296 23.1 L1312 22.9 L1328 23.4 L1344 24.7 L1360 26.8 L1376 29.4 L1392 32.0 L1408 34.1 L1424 35.3 L1440 35.5 L1456 35.0 L1472 34.0 L1488 33.0 L1504 32.4 L1520 32.2 L1536 32.5 L1552 33.0 L1568 33.5 L1584 33.6 L1600 33.4 L1616 33.0 L1632 32.7 L1648 32.7 L1664 33.2 L1680 34.1 L1696 35.2 L1712 36.0 L1728 36.0 L1744 35.2 L1760 33.4 L1776 30.9 L1792 28.2 L1808 25.8 L1824 24.2 L1840 23.4 L1856 23.3 L1872 23.8 L1888 24.4 L1904 24.9 L1920 25.1 L1936 25.1 L1952 25.1 L1968 25.5 L1984 26.2 L2000 27.4 L2016 28.7 L2032 29.8 L2048 30.4 L2064 30.2 L2080 29.3 L2096 28.0 L2112 26.8 L2128 26.1 L2144 26.3 L2160 27.4 L2176 29.3 L2192 31.5 L2208 33.6 L2224 35.2 L2240 36.2 L2256 36.5 L2272 36.5 L2288 36.4 L2304 36.4 L2320 36.5 L2336 36.7 L2352 36.5 L2368 35.9 L2384 34.5 L2400 32.7 L2416 30.5 L2432 28.5 L2448 27.2 L2464 26.7 L2480 27.1 L2496 28.2 L2512 29.5 L2528 30.5 L2544 31.0 L2560 30.6 L2576 29.6 L2592 28.2 L2608 26.8 L2624 25.8 L2640 25.2 L2656 25.0 L2672 24.9 L2688 24.7 L2704 24.3 L2720 23.7 L2736 23.1 L2752 22.9 L2768 23.4 L2784 24.7 L2800 26.8 L2816 29.4 L2832 32.0 L2848 34.1 L2864 35.3 L2880 35.5"/></svg>
+        <span class="glint" aria-hidden="true"></span><span class="glint g2" aria-hidden="true"></span>
         <div class="floats">
           <div class="buoy"><div class="tag"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3s6 6.6 6 11a6 6 0 0 1-12 0c0-4.4 6-11 6-11z"/></svg></i><span class="odo" data-odo="water" data-digits="7"></span><span class="u">لیتر آب</span></div><span class="cap">صرفه‌جویی آب</span><span class="eq" data-sub="tubs"></span></div>
           <div class="buoy"><div class="tag"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></i><span class="odo" data-odo="hours" data-digits="6"></span><span class="u">ساعت</span></div><span class="cap">زمان کادر درمان</span><span class="eq" data-sub="shifts"></span></div>
         </div>
       </div>
-      <div class="fl-foot">
-        <div class="legend"><span><i class="lw"></i>آب</span><span><i class="lf"></i>مایع شست‌وشو و ضدعفونی (نمایش تصویری)</span><span><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg>هر آدمک = ۲۰۰ شیفت کاری ۸ ساعته</span></div>
+      <div class="fluid">
+        <div class="fb"></div><i class="plume" style="left:2%;top:30px;animation-duration:9s;animation-delay:-1s;--px:24px"></i><i class="plume" style="left:24%;top:44px;animation-duration:11s;animation-delay:-5s;--px:-18px"></i><i class="plume" style="left:46%;top:26px;animation-duration:10s;animation-delay:-3s;--px:16px"></i><i class="plume" style="left:66%;top:40px;animation-duration:12s;animation-delay:-7s;--px:-22px"></i><i class="plume" style="left:10%;top:60px;animation-duration:13s;animation-delay:-9s;--px:12px"></i><i class="plume" style="left:56%;top:58px;animation-duration:9.5s;animation-delay:-6s;--px:-10px"></i><i class="plume" style="left:34%;top:14px;animation-duration:12.5s;animation-delay:-2s;--px:20px"></i><i class="plume" style="left:78%;top:22px;animation-duration:10.5s;animation-delay:-8s;--px:-14px"></i><svg class="swirl" viewBox="0 0 400 90" preserveAspectRatio="none" aria-hidden="true"><path d="M10 70 C40 40 70 72 96 46 S150 30 170 54" stroke-width="5" opacity=".7"/><path d="M190 64 C220 30 250 70 280 40 S330 26 352 52" stroke-width="3.5" opacity=".55"/><path d="M60 84 C90 60 120 86 150 66" stroke-width="2.5" opacity=".5"/><path d="M262 84 C292 62 330 88 380 60" stroke-width="3" opacity=".45"/></svg><span class="fshim"></span>
+        <div class="flabel"><div class="tag"><span class="k">هزینه شست‌وشو و ضدعفونی</span><span class="v"><span class="odo" data-odo="cost" data-digits="13"></span><span class="u">تومان</span></span></div></div>
+      </div>
+      <div class="pile" aria-hidden="true"><span class="fig" data-x="0.8" data-y="0" data-r="-4"><svg viewBox="0 0 40 100" aria-hidden="true"><use href="#st-a"/></svg></span><span class="fig" data-x="1.6" data-y="0" data-r="5"><svg viewBox="0 0 40 100" aria-hidden="true"><use href="#st-b"/></svg></span><span class="fig" data-x="0" data-y="0" data-r="-9"><svg viewBox="0 0 40 100" aria-hidden="true"><use href="#st-a"/></svg></span><span class="fig" data-x="2.4" data-y="0" data-r="8"><svg viewBox="0 0 40 100" aria-hidden="true"><use href="#st-b"/></svg></span><span class="fig" data-x="1.2" data-y="0.66" data-r="6"><svg viewBox="0 0 40 100" aria-hidden="true"><use href="#st-a"/></svg></span><span class="fig" data-x="0.4" data-y="0.66" data-r="-8"><svg viewBox="0 0 40 100" aria-hidden="true"><use href="#st-b"/></svg></span><span class="fig" data-x="2.0" data-y="0.66" data-r="4"><svg viewBox="0 0 40 100" aria-hidden="true"><use href="#st-a"/></svg></span><span class="fig" data-x="0.8" data-y="1.32" data-r="-6"><svg viewBox="0 0 40 100" aria-hidden="true"><use href="#st-b"/></svg></span><span class="fig" data-x="1.6" data-y="1.32" data-r="9"><svg viewBox="0 0 40 100" aria-hidden="true"><use href="#st-a"/></svg></span></div>
+      <div class="base">
+        <div class="legend"><span><i class="lw"></i>آب</span><span><i class="lf"></i>مایع شست‌وشو و ضدعفونی (نمایش تصویری)</span><span><svg viewBox="0 0 40 100" aria-hidden="true"><use href="#st-a"/></svg>هر آدمک = ۲۰۰ شیفت کاری ۸ ساعته</span></div>
         <p class="fl-sum" data-sum></p><a class="hero-btn" href="tel:02192001017">مشاوره با کارشناس فروش</a><p class="note">* محاسبات بر اساس فرمول‌های محاسبه‌گر فعلی آبادیس</p>
       </div>
     </div></div>
@@ -219,20 +274,25 @@
               <button class="chip" type="button" data-a="700" data-b="700">۷۰۰ + ۷۰۰</button>
             </div><button class="confirm" type="button" data-confirm hidden></button></div>
       <div class="sea">
-        <svg class="waves" viewBox="0 0 2880 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 22 C120 6 240 6 360 20 S600 36 720 22 S960 6 1080 20 S1320 36 1440 22 C1560 6 1680 6 1800 20 S2040 36 2160 22 S2400 6 2520 20 S2760 36 2880 22 V40 H0 Z" fill="#7fe3f0" opacity=".5"/></svg>
-        <svg class="waves w2" viewBox="0 0 2880 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 22 C160 8 280 10 400 22 S640 34 780 22 S1040 8 1180 20 S1360 32 1440 22 C1600 8 1720 10 1840 22 S2080 34 2220 22 S2480 8 2620 20 S2800 32 2880 22 V40 H0 Z" fill="#3fcbd0"/></svg>
         <div class="body"></div>
-        <div class="fluid"><svg class="waves" viewBox="0 0 2880 16" preserveAspectRatio="none" aria-hidden="true"><path d="M0 9 C180 2 300 2 480 9 S780 16 960 9 S1260 2 1440 9 C1620 2 1740 2 1920 9 S2220 16 2400 9 S2700 2 2880 9 V16 H0 Z" fill="var(--lav1)"/></svg><div class="fbody"></div><span class="fline"></span>
-          <div class="flabel"><div class="tag"><span class="k">هزینه شست‌وشو و ضدعفونی</span><span class="odo" data-odo="cost" data-digits="11"></span><span class="u">تومان</span></div></div>
-        </div>
-        <div class="crew" aria-hidden="true"><span class="fig" data-row="0" style="left:50%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span><span class="fig" data-row="1" style="left:24%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span><span class="fig" data-row="1" style="left:76%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span><span class="fig" data-row="0" style="left:12%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span><span class="fig" data-row="0" style="left:88%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span><span class="fig" data-row="1" style="left:38%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span><span class="fig" data-row="1" style="left:62%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span><span class="fig" data-row="0" style="left:30%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span><span class="fig" data-row="0" style="left:70%"><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg></span></div>
+        <div class="caus" aria-hidden="true"><i></i><i></i></div>
+        <div class="bubbles" aria-hidden="true"><span style="width:10px;height:10px;left:9%;top:46%;animation-duration:9s;animation-delay:-1s"></span><span style="width:5px;height:5px;left:14%;top:38%;animation-duration:7s;animation-delay:-3s"></span><span style="width:7px;height:7px;left:31%;top:58%;animation-duration:11s;animation-delay:-6s"></span><span style="width:4px;height:4px;left:44%;top:34%;animation-duration:6s;animation-delay:-2s"></span><span style="width:12px;height:12px;left:57%;top:64%;animation-duration:10s;animation-delay:-4s"></span><span style="width:6px;height:6px;left:69%;top:42%;animation-duration:8s;animation-delay:-5s"></span><span style="width:4px;height:4px;left:81%;top:52%;animation-duration:7s;animation-delay:-1s"></span><span style="width:9px;height:9px;left:90%;top:36%;animation-duration:9s;animation-delay:-7s"></span></div>
+        <svg class="wv wv3" viewBox="0 0 2880 48" preserveAspectRatio="none" aria-hidden="true"><path d="M0 26.0 L16 26.1 L32 25.4 L48 23.9 L64 22.1 L80 20.6 L96 19.9 L112 20.2 L128 21.0 L144 21.9 L160 22.3 L176 21.9 L192 20.9 L208 19.7 L224 18.9 L240 18.9 L256 19.5 L272 20.5 L288 21.2 L304 21.6 L320 21.7 L336 22.0 L352 22.7 L368 24.2 L384 25.9 L400 27.5 L416 28.1 L432 27.5 L448 25.7 L464 23.2 L480 20.8 L496 19.0 L512 18.1 L528 17.8 L544 17.8 L560 17.7 L576 17.6 L592 17.7 L608 18.4 L624 20.0 L640 22.3 L656 24.7 L672 26.5 L688 27.2 L704 26.8 L720 25.4 L736 23.9 L752 22.8 L768 22.4 L784 22.5 L800 22.7 L816 22.5 L832 21.8 L848 20.9 L864 20.0 L880 19.7 L896 20.1 L912 20.8 L928 21.5 L944 21.5 L960 20.8 L976 19.8 L992 18.8 L1008 18.6 L1024 19.5 L1040 21.3 L1056 23.5 L1072 25.3 L1088 26.3 L1104 26.5 L1120 26.1 L1136 25.6 L1152 25.2 L1168 24.9 L1184 24.4 L1200 23.2 L1216 21.4 L1232 19.0 L1248 16.8 L1264 15.4 L1280 15.3 L1296 16.5 L1312 18.6 L1328 20.8 L1344 22.5 L1360 23.5 L1376 24.0 L1392 24.3 L1408 24.7 L1424 25.4 L1440 26.0 L1456 26.1 L1472 25.4 L1488 23.9 L1504 22.1 L1520 20.6 L1536 19.9 L1552 20.2 L1568 21.0 L1584 21.9 L1600 22.3 L1616 21.9 L1632 20.9 L1648 19.7 L1664 18.9 L1680 18.9 L1696 19.5 L1712 20.5 L1728 21.2 L1744 21.6 L1760 21.7 L1776 22.0 L1792 22.7 L1808 24.2 L1824 25.9 L1840 27.5 L1856 28.1 L1872 27.5 L1888 25.7 L1904 23.2 L1920 20.8 L1936 19.0 L1952 18.1 L1968 17.8 L1984 17.8 L2000 17.7 L2016 17.6 L2032 17.7 L2048 18.4 L2064 20.0 L2080 22.3 L2096 24.7 L2112 26.5 L2128 27.2 L2144 26.8 L2160 25.4 L2176 23.9 L2192 22.8 L2208 22.4 L2224 22.5 L2240 22.7 L2256 22.5 L2272 21.8 L2288 20.9 L2304 20.0 L2320 19.7 L2336 20.1 L2352 20.8 L2368 21.5 L2384 21.5 L2400 20.8 L2416 19.8 L2432 18.8 L2448 18.6 L2464 19.5 L2480 21.3 L2496 23.5 L2512 25.3 L2528 26.3 L2544 26.5 L2560 26.1 L2576 25.6 L2592 25.2 L2608 24.9 L2624 24.4 L2640 23.2 L2656 21.4 L2672 19.0 L2688 16.8 L2704 15.4 L2720 15.3 L2736 16.5 L2752 18.6 L2768 20.8 L2784 22.5 L2800 23.5 L2816 24.0 L2832 24.3 L2848 24.7 L2864 25.4 L2880 26.0 V48 H0 Z"/></svg>
+        <svg class="wv wv2" viewBox="0 0 2880 48" preserveAspectRatio="none" aria-hidden="true"><path d="M0 31.5 L16 32.1 L32 31.2 L48 29.3 L64 27.5 L80 26.0 L96 25.0 L112 23.8 L128 22.3 L144 20.6 L160 19.5 L176 19.7 L192 21.3 L208 23.6 L224 25.5 L240 26.1 L256 25.6 L272 24.5 L288 23.8 L304 23.9 L320 24.7 L336 25.6 L352 26.0 L368 26.3 L384 27.0 L400 28.4 L416 30.6 L432 32.8 L448 33.7 L464 33.1 L480 31.0 L496 28.4 L512 26.3 L528 25.3 L544 24.9 L560 24.6 L576 24.0 L592 23.3 L608 22.9 L624 23.4 L640 24.5 L656 25.5 L672 25.5 L688 24.2 L704 22.2 L720 20.5 L736 19.9 L752 20.8 L768 22.7 L784 24.5 L800 26.0 L816 27.0 L832 28.2 L848 29.7 L864 31.4 L880 32.5 L896 32.3 L912 30.7 L928 28.4 L944 26.5 L960 25.9 L976 26.4 L992 27.5 L1008 28.2 L1024 28.1 L1040 27.3 L1056 26.4 L1072 26.0 L1088 25.7 L1104 25.0 L1120 23.6 L1136 21.4 L1152 19.2 L1168 18.3 L1184 18.9 L1200 21.0 L1216 23.6 L1232 25.7 L1248 26.7 L1264 27.1 L1280 27.4 L1296 28.0 L1312 28.7 L1328 29.1 L1344 28.6 L1360 27.5 L1376 26.5 L1392 26.5 L1408 27.8 L1424 29.8 L1440 31.5 L1456 32.1 L1472 31.2 L1488 29.3 L1504 27.5 L1520 26.0 L1536 25.0 L1552 23.8 L1568 22.3 L1584 20.6 L1600 19.5 L1616 19.7 L1632 21.3 L1648 23.6 L1664 25.5 L1680 26.1 L1696 25.6 L1712 24.5 L1728 23.8 L1744 23.9 L1760 24.7 L1776 25.6 L1792 26.0 L1808 26.3 L1824 27.0 L1840 28.4 L1856 30.6 L1872 32.8 L1888 33.7 L1904 33.1 L1920 31.0 L1936 28.4 L1952 26.3 L1968 25.3 L1984 24.9 L2000 24.6 L2016 24.0 L2032 23.3 L2048 22.9 L2064 23.4 L2080 24.5 L2096 25.5 L2112 25.5 L2128 24.2 L2144 22.2 L2160 20.5 L2176 19.9 L2192 20.8 L2208 22.7 L2224 24.5 L2240 26.0 L2256 27.0 L2272 28.2 L2288 29.7 L2304 31.4 L2320 32.5 L2336 32.3 L2352 30.7 L2368 28.4 L2384 26.5 L2400 25.9 L2416 26.4 L2432 27.5 L2448 28.2 L2464 28.1 L2480 27.3 L2496 26.4 L2512 26.0 L2528 25.7 L2544 25.0 L2560 23.6 L2576 21.4 L2592 19.2 L2608 18.3 L2624 18.9 L2640 21.0 L2656 23.6 L2672 25.7 L2688 26.7 L2704 27.1 L2720 27.4 L2736 28.0 L2752 28.7 L2768 29.1 L2784 28.6 L2800 27.5 L2816 26.5 L2832 26.5 L2848 27.8 L2864 29.8 L2880 31.5 V48 H0 Z"/></svg>
+        <svg class="wv wv1" viewBox="0 0 2880 48" preserveAspectRatio="none" aria-hidden="true"><path class="fill" d="M0 35.5 L16 35.0 L32 34.0 L48 33.0 L64 32.4 L80 32.2 L96 32.5 L112 33.0 L128 33.5 L144 33.6 L160 33.4 L176 33.0 L192 32.7 L208 32.7 L224 33.2 L240 34.1 L256 35.2 L272 36.0 L288 36.0 L304 35.2 L320 33.4 L336 30.9 L352 28.2 L368 25.8 L384 24.2 L400 23.4 L416 23.3 L432 23.8 L448 24.4 L464 24.9 L480 25.1 L496 25.1 L512 25.1 L528 25.5 L544 26.2 L560 27.4 L576 28.7 L592 29.8 L608 30.4 L624 30.2 L640 29.3 L656 28.0 L672 26.8 L688 26.1 L704 26.3 L720 27.4 L736 29.3 L752 31.5 L768 33.6 L784 35.2 L800 36.2 L816 36.5 L832 36.5 L848 36.4 L864 36.4 L880 36.5 L896 36.7 L912 36.5 L928 35.9 L944 34.5 L960 32.7 L976 30.5 L992 28.5 L1008 27.2 L1024 26.7 L1040 27.1 L1056 28.2 L1072 29.5 L1088 30.5 L1104 31.0 L1120 30.6 L1136 29.6 L1152 28.2 L1168 26.8 L1184 25.8 L1200 25.2 L1216 25.0 L1232 24.9 L1248 24.7 L1264 24.3 L1280 23.7 L1296 23.1 L1312 22.9 L1328 23.4 L1344 24.7 L1360 26.8 L1376 29.4 L1392 32.0 L1408 34.1 L1424 35.3 L1440 35.5 L1456 35.0 L1472 34.0 L1488 33.0 L1504 32.4 L1520 32.2 L1536 32.5 L1552 33.0 L1568 33.5 L1584 33.6 L1600 33.4 L1616 33.0 L1632 32.7 L1648 32.7 L1664 33.2 L1680 34.1 L1696 35.2 L1712 36.0 L1728 36.0 L1744 35.2 L1760 33.4 L1776 30.9 L1792 28.2 L1808 25.8 L1824 24.2 L1840 23.4 L1856 23.3 L1872 23.8 L1888 24.4 L1904 24.9 L1920 25.1 L1936 25.1 L1952 25.1 L1968 25.5 L1984 26.2 L2000 27.4 L2016 28.7 L2032 29.8 L2048 30.4 L2064 30.2 L2080 29.3 L2096 28.0 L2112 26.8 L2128 26.1 L2144 26.3 L2160 27.4 L2176 29.3 L2192 31.5 L2208 33.6 L2224 35.2 L2240 36.2 L2256 36.5 L2272 36.5 L2288 36.4 L2304 36.4 L2320 36.5 L2336 36.7 L2352 36.5 L2368 35.9 L2384 34.5 L2400 32.7 L2416 30.5 L2432 28.5 L2448 27.2 L2464 26.7 L2480 27.1 L2496 28.2 L2512 29.5 L2528 30.5 L2544 31.0 L2560 30.6 L2576 29.6 L2592 28.2 L2608 26.8 L2624 25.8 L2640 25.2 L2656 25.0 L2672 24.9 L2688 24.7 L2704 24.3 L2720 23.7 L2736 23.1 L2752 22.9 L2768 23.4 L2784 24.7 L2800 26.8 L2816 29.4 L2832 32.0 L2848 34.1 L2864 35.3 L2880 35.5 V48 H0 Z"/><path class="hl" d="M0 35.5 L16 35.0 L32 34.0 L48 33.0 L64 32.4 L80 32.2 L96 32.5 L112 33.0 L128 33.5 L144 33.6 L160 33.4 L176 33.0 L192 32.7 L208 32.7 L224 33.2 L240 34.1 L256 35.2 L272 36.0 L288 36.0 L304 35.2 L320 33.4 L336 30.9 L352 28.2 L368 25.8 L384 24.2 L400 23.4 L416 23.3 L432 23.8 L448 24.4 L464 24.9 L480 25.1 L496 25.1 L512 25.1 L528 25.5 L544 26.2 L560 27.4 L576 28.7 L592 29.8 L608 30.4 L624 30.2 L640 29.3 L656 28.0 L672 26.8 L688 26.1 L704 26.3 L720 27.4 L736 29.3 L752 31.5 L768 33.6 L784 35.2 L800 36.2 L816 36.5 L832 36.5 L848 36.4 L864 36.4 L880 36.5 L896 36.7 L912 36.5 L928 35.9 L944 34.5 L960 32.7 L976 30.5 L992 28.5 L1008 27.2 L1024 26.7 L1040 27.1 L1056 28.2 L1072 29.5 L1088 30.5 L1104 31.0 L1120 30.6 L1136 29.6 L1152 28.2 L1168 26.8 L1184 25.8 L1200 25.2 L1216 25.0 L1232 24.9 L1248 24.7 L1264 24.3 L1280 23.7 L1296 23.1 L1312 22.9 L1328 23.4 L1344 24.7 L1360 26.8 L1376 29.4 L1392 32.0 L1408 34.1 L1424 35.3 L1440 35.5 L1456 35.0 L1472 34.0 L1488 33.0 L1504 32.4 L1520 32.2 L1536 32.5 L1552 33.0 L1568 33.5 L1584 33.6 L1600 33.4 L1616 33.0 L1632 32.7 L1648 32.7 L1664 33.2 L1680 34.1 L1696 35.2 L1712 36.0 L1728 36.0 L1744 35.2 L1760 33.4 L1776 30.9 L1792 28.2 L1808 25.8 L1824 24.2 L1840 23.4 L1856 23.3 L1872 23.8 L1888 24.4 L1904 24.9 L1920 25.1 L1936 25.1 L1952 25.1 L1968 25.5 L1984 26.2 L2000 27.4 L2016 28.7 L2032 29.8 L2048 30.4 L2064 30.2 L2080 29.3 L2096 28.0 L2112 26.8 L2128 26.1 L2144 26.3 L2160 27.4 L2176 29.3 L2192 31.5 L2208 33.6 L2224 35.2 L2240 36.2 L2256 36.5 L2272 36.5 L2288 36.4 L2304 36.4 L2320 36.5 L2336 36.7 L2352 36.5 L2368 35.9 L2384 34.5 L2400 32.7 L2416 30.5 L2432 28.5 L2448 27.2 L2464 26.7 L2480 27.1 L2496 28.2 L2512 29.5 L2528 30.5 L2544 31.0 L2560 30.6 L2576 29.6 L2592 28.2 L2608 26.8 L2624 25.8 L2640 25.2 L2656 25.0 L2672 24.9 L2688 24.7 L2704 24.3 L2720 23.7 L2736 23.1 L2752 22.9 L2768 23.4 L2784 24.7 L2800 26.8 L2816 29.4 L2832 32.0 L2848 34.1 L2864 35.3 L2880 35.5"/></svg>
+        <span class="glint" aria-hidden="true"></span><span class="glint g2" aria-hidden="true"></span>
         <div class="floats">
           <div class="buoy"><div class="tag"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3s6 6.6 6 11a6 6 0 0 1-12 0c0-4.4 6-11 6-11z"/></svg></i><span class="odo" data-odo="water" data-digits="7"></span><span class="u">لیتر آب</span></div><span class="cap">صرفه‌جویی آب</span><span class="eq" data-sub="tubs"></span></div>
           <div class="buoy"><div class="tag"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></i><span class="odo" data-odo="hours" data-digits="6"></span><span class="u">ساعت</span></div><span class="cap">زمان کادر درمان</span><span class="eq" data-sub="shifts"></span></div>
         </div>
       </div>
-      <div class="fl-foot">
-        <div class="legend"><span><i class="lw"></i>آب</span><span><i class="lf"></i>مایع شست‌وشو و ضدعفونی (نمایش تصویری)</span><span><svg viewBox="0 0 50 58" aria-hidden="true"><use href="#i-crew"/></svg>هر آدمک = ۱٬۵۰۰ شیفت کاری ۸ ساعته</span></div>
+      <div class="fluid">
+        <div class="fb"></div><i class="plume" style="left:2%;top:30px;animation-duration:9s;animation-delay:-1s;--px:24px"></i><i class="plume" style="left:24%;top:44px;animation-duration:11s;animation-delay:-5s;--px:-18px"></i><i class="plume" style="left:46%;top:26px;animation-duration:10s;animation-delay:-3s;--px:16px"></i><i class="plume" style="left:66%;top:40px;animation-duration:12s;animation-delay:-7s;--px:-22px"></i><i class="plume" style="left:10%;top:60px;animation-duration:13s;animation-delay:-9s;--px:12px"></i><i class="plume" style="left:56%;top:58px;animation-duration:9.5s;animation-delay:-6s;--px:-10px"></i><i class="plume" style="left:34%;top:14px;animation-duration:12.5s;animation-delay:-2s;--px:20px"></i><i class="plume" style="left:78%;top:22px;animation-duration:10.5s;animation-delay:-8s;--px:-14px"></i><svg class="swirl" viewBox="0 0 400 90" preserveAspectRatio="none" aria-hidden="true"><path d="M10 70 C40 40 70 72 96 46 S150 30 170 54" stroke-width="5" opacity=".7"/><path d="M190 64 C220 30 250 70 280 40 S330 26 352 52" stroke-width="3.5" opacity=".55"/><path d="M60 84 C90 60 120 86 150 66" stroke-width="2.5" opacity=".5"/><path d="M262 84 C292 62 330 88 380 60" stroke-width="3" opacity=".45"/></svg><span class="fshim"></span>
+        <div class="flabel"><div class="tag"><span class="k">هزینه شست‌وشو و ضدعفونی</span><span class="v"><span class="odo" data-odo="cost" data-digits="11"></span><span class="u">تومان</span></span></div></div>
+      </div>
+      <div class="pile" aria-hidden="true"><span class="fig" data-x="0.8" data-y="0" data-r="-4"><svg viewBox="0 0 40 100" aria-hidden="true"><use href="#st-a"/></svg></span><span class="fig" data-x="1.6" data-y="0" data-r="5"><svg viewBox="0 0 40 100" aria-hidden="true"><use href="#st-b"/></svg></span><span class="fig" data-x="0" data-y="0" data-r="-9"><svg viewBox="0 0 40 100" aria-hidden="true"><use href="#st-a"/></svg></span><span class="fig" data-x="2.4" data-y="0" data-r="8"><svg viewBox="0 0 40 100" aria-hidden="true"><use href="#st-b"/></svg></span><span class="fig" data-x="1.2" data-y="0.66" data-r="6"><svg viewBox="0 0 40 100" aria-hidden="true"><use href="#st-a"/></svg></span><span class="fig" data-x="0.4" data-y="0.66" data-r="-8"><svg viewBox="0 0 40 100" aria-hidden="true"><use href="#st-b"/></svg></span><span class="fig" data-x="2.0" data-y="0.66" data-r="4"><svg viewBox="0 0 40 100" aria-hidden="true"><use href="#st-a"/></svg></span><span class="fig" data-x="0.8" data-y="1.32" data-r="-6"><svg viewBox="0 0 40 100" aria-hidden="true"><use href="#st-b"/></svg></span><span class="fig" data-x="1.6" data-y="1.32" data-r="9"><svg viewBox="0 0 40 100" aria-hidden="true"><use href="#st-a"/></svg></span></div>
+      <div class="base">
+        <div class="legend"><span><i class="lw"></i>آب</span><span><i class="lf"></i>مایع شست‌وشو و ضدعفونی (نمایش تصویری)</span><span><svg viewBox="0 0 40 100" aria-hidden="true"><use href="#st-a"/></svg>هر آدمک = ۱٬۵۰۰ شیفت کاری ۸ ساعته</span></div>
         <p class="fl-sum" data-sum></p><a class="hero-btn" href="tel:02192001017">مشاوره با کارشناس فروش</a><p class="note">* محاسبات بر اساس فرمول‌های محاسبه‌گر فعلی آبادیس</p>
       </div>
     </div></div>
@@ -281,9 +341,10 @@
 
     (() => {
       const A = Abadis, fa = A.fa;
+      const SOFT = 78;   // px of soft boundary above the fluid's nominal surface
       function setup(root, kind) {
         const pin = root.querySelector('.calc-pin'), topEl = root.querySelector('.fl-top'), sea = root.querySelector('.sea');
-        const fluid = root.querySelector('.fluid'), flabel = root.querySelector('.flabel'), foot = root.querySelector('.fl-foot');
+        const fluid = root.querySelector('.fluid'), base = root.querySelector('.base'), pile = root.querySelector('.pile');
         const figs = [...root.querySelectorAll('.fig')], per = +root.dataset.per;
         const sum = root.querySelector('[data-sum]'), hint = root.querySelector('[data-hint]');
         const sub = {}; root.querySelectorAll('[data-sub]').forEach((e) => { sub[e.dataset.sub] = e; });
@@ -291,28 +352,26 @@
         return A.createCalc(root, kind, (s) => {
           const f = Math.min(1, kind === 'surgery' ? s.fr.input : s.fr.water);
           const mob = innerWidth <= 860;
-          const pinH = pin.clientHeight || innerHeight, tb = topEl.offsetTop + topEl.offsetHeight;
-          const lo = mob ? 40 : 34, hi = mob ? 62 : 58;
-          const cap = Math.max(lo + 4, (pinH - tb - (mob ? 48 : 60)) / pinH * 100);
-          const level = lo + (Math.min(hi, cap) - lo) * f;
-          sea.style.transform = 'translateY(' + (100 - level).toFixed(2) + '%)';
-          // washing-fluid layer: a fixed visual share of the water column that grows with the same scroll (no volume figure)
-          const col = pinH * level / 100, share = s.C > 0 ? 0.3 + 0.18 * f : 0, fh = col * share;
-          fluid.style.transform = 'translateY(' + (col - fh).toFixed(1) + 'px)';
-          const footUp = pinH - foot.offsetTop, lift = Math.max(0, footUp + 24 - fh);
-          flabel.style.transform = 'translate(-50%, calc(-50% - ' + lift.toFixed(1) + 'px))';
-          flabel.style.opacity = s.C > 0 ? '1' : '0';
-          // crew: one figure per `per` shifts, the last one fades in proportionally
-          // two rows of figures fitted between the surface tags and the fluid label
-          const figH = mob ? 40 : 58, bandTop = mob ? 74 : 86;
-          const bandBot = col - fh - lift - (mob ? 22 : 26) - figH;
-          const gap = Math.max(0, Math.min(mob ? 46 : 70, bandBot - bandTop));
-          const rowY = [bandTop, bandTop + gap];
-          const count = s.H / 8 / per;
+          const pinH = pin.clientHeight || innerHeight, baseH = base.offsetHeight, floorY = pinH - baseH;
+          const tb = topEl.offsetTop + topEl.offsetHeight;
+          const colMax = Math.max(140, floorY - tb - (mob ? 46 : 58));
+          const colMin = Math.min(colMax - 20, mob ? 200 : 180);
+          const col = colMin + (colMax - colMin) * f;            // water depth above the tank floor (px)
+          sea.style.transform = 'translateY(' + (floorY - col).toFixed(1) + 'px)';
+          // fluid: fixed visual share of the column, grows with the same scroll (no volume figure)
+          const fh = s.C > 0 ? col * (0.3 + 0.18 * f) : 0;
+          fluid.style.transform = 'translateY(' + (floorY - fh - SOFT).toFixed(1) + 'px)';
+          fluid.style.opacity = s.C > 0 ? '1' : '0';
+          // staff pile on the floor: one figure per `per` shifts
+          pile.style.bottom = baseH + 'px';
+          const fw = figs[0].offsetWidth, fhgt = figs[0].offsetHeight;
+          const count = Math.min(figs.length, Math.floor(s.H / 8 / per));
           figs.forEach((g, i) => {
-            const o = Math.max(0, Math.min(1, count - i));
-            g.style.opacity = o.toFixed(3); g.classList.toggle('on', o > 0);
-            g.style.top = rowY[+g.dataset.row] + 'px';
+            const x = +g.dataset.x * fw, y = +g.dataset.y * fhgt, r = +g.dataset.r;
+            g.style.left = x.toFixed(1) + 'px'; g.style.bottom = y.toFixed(1) + 'px';
+            const on = i < count;
+            g.classList.toggle('on', on);
+            g.style.transform = on ? 'rotate(' + r + 'deg)' : 'translate(' + (r * 3) + 'px,' + (-(col - y)).toFixed(0) + 'px) rotate(' + (-r * 2) + 'deg)';
           });
           sub.tubs.textContent = s.W > 0 ? '≈ ' + fa(s.W / 200) + ' وان ۲۰۰ لیتری (تقریبی)' : '';
           sub.shifts.textContent = s.H > 0 ? '≈ ' + fa(s.H / 8) + ' شیفت کاری ۸ ساعته' : '';
